@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Scientific Python Lab – Unit 3</title>
+<meta name="description" content="SciPy, statsmodels, SymPy and NetworkX lessons with in-browser Python and marked tasks.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231F4E8C'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='15' font-weight='700' fill='white' text-anchor='middle'%3Esp%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600&family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --bg:#FFFFFF; --surface:#F5F7FA; --surface-2:#EBF1F8; --line:#DCE3EB;
+  --ink:#1A2433; --ink-2:#4A5568; --muted:#6B778A;
+  --blue:#1F4E8C; --blue-ink:#173D6E; --blue-soft:#E7EFF9;
+  --green:#2E7D5B; --green-soft:#E6F3EC; --red:#B4472F; --red-soft:#FBEAE5;
+  --amber:#8A5A00; --amber-soft:#FFF4D6;
+  --code-bg:#F7F9FC; --c-kw:#7A3EA0; --c-str:#9A4A12; --c-com:#2E7D5B; --c-num:#1F4E8C; --c-bi:#0B6E79;
+  --serif:"Source Serif 4", Cambria, Georgia, serif;
+  --sans:"Source Sans 3", Calibri, "Segoe UI", Arial, sans-serif;
+  --mono:"Source Code Pro", Consolas, "Courier New", monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#151A21; --surface:#1C232C; --surface-2:#22303F; --line:#2F3B49;
+    --ink:#E6EBF1; --ink-2:#B8C2CF; --muted:#8C99A9;
+    --blue:#7FAEE8; --blue-ink:#A8C8F0; --blue-soft:#1F3049;
+    --green:#6CC59B; --green-soft:#1C3328; --red:#EC8A72; --red-soft:#3A2420;
+    --amber:#E8B95A; --amber-soft:#3A3018;
+    --code-bg:#181E26; --c-kw:#C79BEA; --c-str:#E4A06A; --c-com:#7CCB9F; --c-num:#8FB8F0; --c-bi:#6FD0D8;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#151A21; --surface:#1C232C; --surface-2:#22303F; --line:#2F3B49;
+  --ink:#E6EBF1; --ink-2:#B8C2CF; --muted:#8C99A9;
+  --blue:#7FAEE8; --blue-ink:#A8C8F0; --blue-soft:#1F3049;
+  --green:#6CC59B; --green-soft:#1C3328; --red:#EC8A72; --red-soft:#3A2420;
+  --amber:#E8B95A; --amber-soft:#3A3018;
+  --code-bg:#181E26; --c-kw:#C79BEA; --c-str:#E4A06A; --c-com:#7CCB9F; --c-num:#8FB8F0; --c-bi:#6FD0D8;
+  color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:72px}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:17px; line-height:1.6; -webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit; color:inherit}
+:focus-visible{outline:3px solid var(--blue); outline-offset:2px}
+[hidden]{display:none !important}
+a{color:var(--blue)}
+code{font-family:var(--mono); font-size:.88em; background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0 4px; overflow-wrap:anywhere}
+pre{font-family:var(--mono); font-size:14px; line-height:1.5}
+
+/* top bar */
+.top{position:sticky; top:0; z-index:30; background:var(--bg); border-bottom:1px solid var(--line); display:flex; align-items:center; gap:10px; padding:10px 16px; padding-top:calc(10px + env(safe-area-inset-top,0px))}
+.top .menu{display:none; border:1px solid var(--line); background:var(--bg); border-radius:8px; padding:4px 10px; cursor:pointer}
+.top .ttl{font-family:var(--serif); font-weight:700; font-size:18px; flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-decoration:none; color:var(--ink)}
+.top .ttl span{color:var(--muted); font-family:var(--sans); font-weight:400; font-size:15px; margin-left:8px}
+.pill{font-size:13px; border:1px solid var(--line); border-radius:999px; padding:3px 10px; white-space:nowrap; background:var(--surface); color:var(--ink-2); cursor:default}
+.pill i{display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--muted); margin-right:6px; vertical-align:1px}
+.pill.ready i{background:var(--green)} .pill.loading i{background:var(--amber); animation:blink 1s infinite} .pill.error{cursor:pointer} .pill.error i{background:var(--red)}
+@keyframes blink{50%{opacity:.3}}
+.iconbtn{border:1px solid var(--line); background:var(--bg); border-radius:50%; width:36px; height:36px; cursor:pointer; font-size:17px; line-height:1; flex:none}
+.userbtn{border:1px solid var(--line); background:var(--bg); border-radius:999px; padding:4px 12px 4px 4px; cursor:pointer; display:flex; align-items:center; gap:8px; max-width:220px; font-size:15px}
+.userbtn .av{width:28px; height:28px; border-radius:50%; background:var(--blue); color:#fff; display:grid; place-items:center; font-weight:700; font-size:14px; flex:none}
+:root[data-theme="dark"] .userbtn .av{color:#10161D}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .userbtn .av{color:#10161D}}
+.userbtn span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.prog{height:3px; background:var(--line); position:sticky; top:calc(57px + env(safe-area-inset-top,0px)); z-index:29}
+.prog i{display:block; height:100%; background:var(--green); width:0; transition:width .4s}
+
+/* layout */
+.layout{display:grid; grid-template-columns:290px minmax(0,1fr); max-width:1380px; margin:0 auto}
+.toc{position:sticky; top:60px; height:calc(100vh - 60px); overflow:auto; padding:18px 12px 40px 18px; border-right:1px solid var(--line)}
+.toc h4{font-size:13px; color:var(--muted); font-weight:700; letter-spacing:.04em; text-transform:uppercase; margin:18px 0 4px 8px}
+.toc h4:first-child{margin-top:0}
+.toc ol{list-style:none; margin:0; padding:0}
+.toc a{display:grid; grid-template-columns:16px 1fr auto; gap:6px; align-items:baseline; padding:5px 8px; border-radius:6px; text-decoration:none; color:var(--ink-2); font-size:15px; line-height:1.3}
+.toc a:hover{background:var(--surface)}
+.toc a[aria-current="page"]{background:var(--blue-soft); color:var(--blue-ink); font-weight:600}
+.toc .tick{color:var(--green); font-size:13px}
+.toc .cnt{font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums}
+.scrim{display:none}
+main{padding:30px clamp(16px,4vw,56px) 60px; min-width:0}
+.sec{max-width:900px}
+.kicker{color:var(--blue); font-weight:600; font-size:15px; margin:0 0 4px}
+h1{font-family:var(--serif); font-size:clamp(30px,4vw,42px); line-height:1.15; margin:0 0 12px}
+h2{font-family:var(--serif); font-size:clamp(26px,3.2vw,34px); line-height:1.2; margin:0 0 10px}
+h3{font-family:var(--serif); font-size:22px; margin:34px 0 10px; padding-top:6px; border-top:1px solid var(--line)}
+p{margin:0 0 12px}
+.lead{font-size:19px; color:var(--ink-2); max-width:66ch}
+.prose{max-width:72ch}
+.prose ul,.prose ol{padding-left:22px; margin:0 0 12px}
+.prose li{margin-bottom:5px}
+.muted{color:var(--muted)}
+.small{font-size:15px}
+pre.diagram{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:10px 14px; overflow-x:auto}
+.cols{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:12px 0}
+.box{border:1px solid var(--line); border-radius:10px; padding:12px 14px; background:var(--bg)}
+.box h4{margin:0 0 4px; font-size:16px}
+.box p{margin:0; color:var(--ink-2); font-size:15px}
+.box pre{margin:0; white-space:pre-wrap}
+.callout{border-left:4px solid var(--blue); background:var(--blue-soft); padding:10px 14px; border-radius:0 8px 8px 0; margin:14px 0; max-width:74ch}
+.callout.green{border-color:var(--green); background:var(--green-soft)}
+.prose h4{margin:16px 0 4px; font-size:17px}
+table.t{border-collapse:collapse; margin:10px 0 14px; font-size:15.5px; width:100%; max-width:760px}
+table.t th,table.t td{border:1px solid var(--line); padding:6px 10px; text-align:left; vertical-align:top}
+table.t th{background:var(--surface)}
+.tablewrap{overflow-x:auto}
+
+.btn{border:1px solid var(--blue); background:var(--blue); color:#fff; border-radius:8px; padding:7px 14px; cursor:pointer; font-weight:600; font-size:15px; white-space:nowrap}
+:root[data-theme="dark"] .btn{color:#10161D}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn{color:#10161D}}
+.btn.ghost{background:transparent; color:var(--blue) !important; border-color:var(--line)}
+.btn.ok{background:var(--green); border-color:var(--green)}
+.btn:disabled{opacity:.45; cursor:default}
+.btn.lg{padding:10px 20px; font-size:17px}
+.row{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+
+/* syntax table */
+.syn{width:100%; border-collapse:collapse; font-size:15px}
+.syn td{border-bottom:1px solid var(--line); padding:6px 8px; vertical-align:top}
+.syn td:first-child{font-family:var(--mono); font-size:13.5px; white-space:pre-wrap; overflow-wrap:anywhere; width:52%; color:var(--blue-ink)}
+
+/* editor */
+.ed{position:relative; font-family:var(--mono); font-size:14px; line-height:1.55; background:var(--code-bg); border:1px solid var(--line); border-radius:8px; tab-size:4}
+.ed:focus-within{border-color:var(--blue); box-shadow:0 0 0 2px var(--blue-soft)}
+.ed pre,.ed textarea{margin:0; padding:12px 14px; border:0; font:inherit; letter-spacing:0; white-space:pre-wrap; overflow-wrap:anywhere; word-break:normal; tab-size:4}
+.ed pre{min-height:3.4em; pointer-events:none; color:var(--ink)}
+.ed pre code{background:none; border:0; padding:0; font:inherit; border-radius:0}
+.ed textarea{position:absolute; inset:0; width:100%; height:100%; resize:none; background:transparent; color:transparent; caret-color:var(--ink); overflow:hidden; outline:none}
+.ed textarea::selection{background:rgba(31,78,140,.25); color:transparent}
+.ed.ro textarea{display:none}
+.tk-kw{color:var(--c-kw); font-weight:600} .tk-str{color:var(--c-str)} .tk-com{color:var(--c-com); font-style:italic} .tk-num{color:var(--c-num)} .tk-bi{color:var(--c-bi)}
+.codeblock{background:var(--code-bg); border:1px solid var(--line); border-radius:8px; padding:10px 14px; margin:8px 0; white-space:pre-wrap; overflow-wrap:anywhere}
+
+/* cards */
+.card{border:1px solid var(--line); border-radius:12px; padding:16px; margin:16px 0; background:var(--surface)}
+.card-h{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:8px}
+.card-h b{font-size:17px}
+.badge{font-size:12.5px; font-weight:700; background:var(--blue); color:#fff; border-radius:4px; padding:1px 8px; letter-spacing:.02em}
+:root[data-theme="dark"] .badge{color:#10161D}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .badge{color:#10161D}}
+.status{margin-left:auto; font-size:13.5px; border-radius:999px; padding:1px 10px; border:1px solid var(--line); background:var(--bg); color:var(--muted)}
+.status.done{color:var(--green); border-color:var(--green); background:var(--green-soft); font-weight:600}
+.status.tried{color:var(--amber); border-color:var(--amber); background:var(--amber-soft)}
+.task-q{margin:0 0 10px}
+.actions{display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 0}
+.kbd{font-size:12.5px; color:var(--muted); margin-left:auto; align-self:center}
+.out{margin-top:10px; border:1px solid var(--line); border-radius:8px; background:var(--bg); overflow:hidden}
+.out-h{font-size:12.5px; font-weight:700; color:var(--muted); padding:4px 12px; border-bottom:1px solid var(--line); background:var(--surface); display:flex; gap:8px}
+.out pre{margin:0; padding:10px 12px; white-space:pre; overflow-x:auto; max-height:420px}
+.out pre.err{color:var(--red); white-space:pre-wrap}
+.verdict{margin-top:10px; border-radius:8px; padding:8px 12px; font-size:15.5px; white-space:pre-wrap; font-family:var(--sans)}
+.verdict.ok{background:var(--green-soft); color:var(--green); border:1px solid var(--green); font-weight:600}
+.verdict.no{background:var(--red-soft); color:var(--ink); border:1px solid var(--red)}
+.verdict.info{background:var(--blue-soft); color:var(--ink); border:1px solid var(--line)}
+.verdict pre{font-size:13px; margin:6px 0 0; white-space:pre; overflow-x:auto}
+details.exp{margin-top:10px}
+details.exp summary{cursor:pointer; font-size:15px; color:var(--blue); font-weight:600}
+details.exp pre{background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:10px 12px; margin:6px 0 0; overflow-x:auto}
+.hintbox{margin-top:10px; background:var(--amber-soft); border:1px solid var(--line); border-radius:8px; padding:8px 12px; font-size:15.5px}
+.solbox{margin-top:10px}
+.solbox .lbl{font-size:13px; font-weight:700; color:var(--muted)}
+
+/* mcq */
+.mcq .opts{display:grid; gap:8px; margin-top:8px}
+.opt{display:flex; gap:10px; align-items:flex-start; text-align:left; border:1px solid var(--line); background:var(--bg); border-radius:8px; padding:8px 12px; cursor:pointer; font-size:15.5px}
+.opt:hover:not(:disabled){border-color:var(--blue)}
+.opt .l{font-weight:700; color:var(--muted); flex:none}
+.opt .tx{white-space:pre-wrap; font-family:inherit}
+.opt.code .tx{font-family:var(--mono); font-size:14px}
+.opt.right{border-color:var(--green); background:var(--green-soft)}
+.opt.wrong{border-color:var(--red); background:var(--red-soft)}
+.opt:disabled{cursor:default}
+.why{margin-top:8px; font-size:15.5px}
+
+/* home */
+.hero{padding:6px 0 10px}
+.auth{border:1px solid var(--line); border-radius:12px; padding:16px 18px; background:var(--surface); margin:18px 0; max-width:720px}
+.auth h4{margin:0 0 6px; font-size:18px}
+.field{display:grid; gap:4px; margin:0 0 10px}
+.field label{font-size:14px; font-weight:600; color:var(--ink-2)}
+.field input{border:1px solid var(--line); border-radius:8px; padding:8px 10px; background:var(--bg); max-width:380px}
+.steps{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin:14px 0 6px}
+.steps div{border:1px solid var(--line); border-radius:10px; padding:12px 14px}
+.steps .st{display:block; font-family:var(--serif); font-size:19px; font-weight:700; color:var(--blue)}
+.plan{list-style:none; padding:0; margin:0; border-top:1px solid var(--line)}
+.plan li{border-bottom:1px solid var(--line)}
+.plan a{display:grid; grid-template-columns:40px 1fr auto; gap:2px 12px; padding:10px 4px; text-decoration:none; color:var(--ink); align-items:center}
+.plan a:hover{background:var(--surface)}
+.plan .n{font-family:var(--serif); font-weight:700; font-size:20px; color:var(--blue); grid-row:span 2}
+.plan .meta{color:var(--ink-2); font-size:14.5px}
+.plan .pc{grid-row:span 2; font-size:14px; color:var(--muted); font-variant-numeric:tabular-nums; text-align:right; min-width:64px}
+.bar{height:8px; background:var(--line); border-radius:999px; overflow:hidden; margin-top:4px}
+.bar i{display:block; height:100%; background:var(--green); width:0}
+.stat{display:flex; gap:26px; flex-wrap:wrap; margin:14px 0}
+.stat b{display:block; font-family:var(--serif); font-size:34px; color:var(--blue); line-height:1.1}
+.stat span{font-size:14.5px; color:var(--ink-2)}
+.banner{border:1px solid var(--line); background:var(--amber-soft); border-radius:10px; padding:8px 14px; margin:0 0 18px; font-size:15.5px; display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+.nav2{display:flex; justify-content:space-between; gap:12px; margin-top:34px; padding-top:16px; border-top:1px solid var(--line)}
+.nav2 a{text-decoration:none; font-weight:600}
+.ptable{width:100%; border-collapse:collapse; font-size:15px}
+.ptable td,.ptable th{border-bottom:1px solid var(--line); padding:6px 8px; text-align:left}
+.ptable th{color:var(--muted); font-size:13px}
+.grid-items{display:flex; flex-wrap:wrap; gap:4px}
+.grid-items a{width:28px; height:22px; border-radius:4px; background:var(--line); display:inline-block; font-size:10px; text-align:center; line-height:22px; color:var(--ink-2); text-decoration:none}
+.grid-items a.ok{background:var(--green); color:#fff}
+.grid-items a.tr{background:var(--amber-soft); color:var(--amber); border:1px solid var(--amber)}
+footer{color:var(--muted); font-size:14px; margin-top:40px}
+
+dialog{border:1px solid var(--line); border-radius:12px; padding:20px; background:var(--bg); color:var(--ink); max-width:min(480px,92vw)}
+dialog::backdrop{background:rgba(0,0,0,.4)}
+.menu-pop{position:absolute; right:12px; top:56px; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:10px; box-shadow:0 8px 24px rgba(0,0,0,.15); z-index:40; min-width:220px; font-size:15px}
+.menu-pop button{display:block; width:100%; text-align:left; background:none; border:0; padding:6px 8px; border-radius:6px; cursor:pointer}
+.menu-pop button:hover{background:var(--surface)}
+.toast{position:fixed; left:50%; bottom:20px; transform:translateX(-50%); background:var(--ink); color:var(--bg); padding:8px 16px; border-radius:8px; opacity:0; transition:opacity .2s; pointer-events:none; z-index:60; max-width:90vw}
+.toast.show{opacity:1}
+
+@media (max-width: 900px){
+  .layout{grid-template-columns:1fr}
+  .top .menu{display:block}
+  .toc{position:fixed; left:0; top:0; bottom:0; height:auto; width:290px; max-width:85vw; background:var(--bg); z-index:50; transform:translateX(-100%); transition:transform .2s; padding-top:20px}
+  body.nav-open .toc{transform:none}
+  body.nav-open .scrim{display:block; position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:45}
+  .top .ttl span{display:none}
+  .kbd{display:none}
+}
+@media (max-width: 560px){
+  .pill .lbl{display:none}
+  .userbtn span{display:none}
+  .userbtn{padding:4px}
+  main{padding:20px 16px 50px}
+  .card{padding:12px}
+}
+
+.prose h4{margin:16px 0 4px; font-size:17px}
+.callout.green{border-color:var(--green); background:var(--green-soft)}
+.gate{max-width:620px; margin:60px auto; padding:0 16px}
+.gate .auth{margin:18px 0}
+.details{border-collapse:collapse; margin:10px 0 14px; font-size:16px}
+.details td{padding:6px 12px 6px 0; border-bottom:1px solid var(--line)}
+.details td:first-child{color:var(--muted); font-weight:600; width:140px}
+.lock{font-size:13px}
+.toc .lockrow{display:grid; grid-template-columns:16px 1fr auto; gap:6px; padding:5px 8px; color:var(--muted); font-size:15px}
+.topicbar{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; border:1px solid var(--line); background:var(--surface); border-radius:10px; padding:10px 14px; margin:0 0 18px}
+.topicbar .tb-l{font-size:15.5px}
+.topicbar.final{background:var(--green-soft); border-color:var(--green)}
+.topicbar.locked{background:var(--amber-soft)}
+.tcards{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:14px; margin:14px 0}
+.tcard{border:1px solid var(--line); border-radius:12px; padding:14px 16px; background:var(--bg); display:flex; flex-direction:column; gap:6px}
+.tcard h3{margin:0; padding:0; border:0; font-size:21px}
+.tcard .st{font-size:14px; font-weight:600}
+.tcard .st.open{color:var(--green)} .tcard .st.locked{color:var(--amber)} .tcard .st.done{color:var(--blue)}
+.tcard p{margin:0; font-size:15px; color:var(--ink-2)}
+.tcard .row{margin-top:auto}
+.ed.ro{opacity:.85}
+.ed.ro textarea{display:none}
+.teach{background:var(--blue-soft); border:1px solid var(--line); border-radius:10px; padding:8px 14px; margin:0 0 16px; font-size:15px}
+.marks td,.marks th{padding:8px 10px; border-bottom:1px solid var(--line); text-align:left}
+.marks{border-collapse:collapse; width:100%; max-width:760px; font-size:16px}
+dialog .row{margin-top:14px}
+</style>
+</head>
+<body>
+<header class="top">
+  <button class="menu" id="menuBtn" aria-label="Open lessons menu" hidden>☰</button>
+  <a class="ttl" href="#home">Scientific Python Lab<span>Unit 3 · SciPy · statsmodels · SymPy · NetworkX</span></a>
+  <span class="pill" id="pyPill" title="In-browser Python status" hidden><i></i><span class="lbl">Python: </span><span id="pyTxt">not started</span></span>
+  <span id="userSlot"></span>
+  <button class="iconbtn" id="themeBtn" aria-label="Toggle dark mode">◐</button>
+</header>
+<div class="prog" aria-hidden="true"><i id="progBar"></i></div>
+<div id="gate"></div>
+<div class="layout" id="app" hidden>
+  <nav class="toc" id="toc" aria-label="Topics and lessons"></nav>
+  <div class="scrim" id="scrim"></div>
+  <main id="main"></main>
+</div>
+<div class="menu-pop" id="userMenu" hidden></div>
+<dialog id="dlg"></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="config.js"></script>
+<script src="content.js"></script>
+<script>
+"use strict";
+if (!Array.isArray(window.COURSE)) {
+  document.body.innerHTML = '<div style="max-width:640px;margin:60px auto;padding:20px;font-family:sans-serif;line-height:1.6;border:1px solid #dce3eb;border-radius:12px"><h2 style="margin-top:0">Course content not found</h2><p>This page needs <b>content.js</b> and <b>config.js</b> in the same folder. Open the live site link instead of a single-file preview.</p></div>';
+  throw new Error("content.js missing");
+}
+const C = window.COURSE, TOPICS = window.TOPICS;
+const $ = (s, el=document) => el.querySelector(s);
+const $$ = (s, el=document) => [...el.querySelectorAll(s)];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const LS = {
+  get(k, d=null){ try{ const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+const toast = m => { const t = $("#toast"); t.textContent = m; t.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("show"), 3000); };
+const TEACHERS = (window.TEACHERS || []).map(s => s.toLowerCase());
+
+/* ---------- course index ---------- */
+const ITEMS = {}, LESSON = {}, TOPIC = {};
+TOPICS.forEach(t => { TOPIC[t.id] = Object.assign({}, t, { lessons: [], tasks: [], mcqs: [] }); });
+C.forEach(L => {
+  LESSON[L.id] = L;
+  const T = TOPIC[L.topic]; T.lessons.push(L); L.num = T.lessons.length;
+  L.tasks.forEach((t, i) => { ITEMS[t.id] = { kind: "task", lesson: L.id, topic: L.topic, n: i + 1, obj: t }; T.tasks.push(t.id); });
+  L.mcq.forEach((q, i) => { ITEMS[q.id] = { kind: "mcq", lesson: L.id, topic: L.topic, n: i + 1, obj: q }; T.mcqs.push(q.id); });
+});
+
+/* ---------- state ---------- */
+let USER = null, PROFILE = null, ROSTER = null, IS_TEACHER = false;
+let SETTINGS = { open: {}, feedback: {}, solutions: {} };
+let PROG = {};          // topic -> { items: {id: {ok, tries, at}}, final, finalAt, score, total }
+let SUBCODE = {};       // task id -> last submitted code (from server)
+let CURRENT = "home";
+const tp = t => PROG[t] || (PROG[t] = { items: {}, final: false });
+const isOpen = t => IS_TEACHER || !!SETTINGS.open[t];
+const isFinal = t => !!(PROG[t] && PROG[t].final);
+const showResults = t => IS_TEACHER || !!SETTINGS.feedback[t] || (isFinal(t) && !!SETTINGS.solutions[t]);
+const showSolutions = t => IS_TEACHER || (isFinal(t) && !!SETTINGS.solutions[t]);
+const rec = id => { const it = ITEMS[id]; return it ? tp(it.topic).items[id] : null; };
+const submitted = id => !!rec(id);
+const correct = id => !!(rec(id) && rec(id).ok);
+const topicAnswered = t => TOPIC[t].tasks.filter(submitted).length;
+const topicScore = t => TOPIC[t].tasks.filter(correct).length;
+const draftKey = id => "u3-code-" + (USER ? USER.uid : "x") + "-" + id;
+
+const KW = new Set("False None True and as assert async await break class continue def del elif else except finally for from global if import in is lambda nonlocal not or pass raise return try while with yield".split(" "));
+const BI = new Set("print len range sum min max round abs sorted list dict set tuple int float str bool type enumerate zip open isinstance input map filter reversed any all".split(" "));
+function hl(src){
+  const re = /(#[^\n]*)|((?:\b[rRbBfFuU]{1,2})?(?:"""[\s\S]*?(?:"""|$)|'''[\s\S]*?(?:'''|$)|"(?:\\.|[^"\\\n])*"?|'(?:\\.|[^'\\\n])*'?))|(\b\d[\d_]*(?:\.\d*)?(?:[eE][+-]?\d+)?\b)|([A-Za-z_]\w*)/g;
+  let out = "", last = 0, m;
+  while ((m = re.exec(src))) {
+    out += esc(src.slice(last, m.index)); last = re.lastIndex;
+    const s = esc(m[0]);
+    if (m[1]) out += `<span class="tk-com">${s}</span>`;
+    else if (m[2]) out += `<span class="tk-str">${s}</span>`;
+    else if (m[3]) out += `<span class="tk-num">${s}</span>`;
+    else if (KW.has(m[4])) out += `<span class="tk-kw">${s}</span>`;
+    else if (BI.has(m[4])) out += `<span class="tk-bi">${s}</span>`;
+    else out += s;
+  }
+  return out + esc(src.slice(last));
+}
+
+/* ---------- editor ---------- */
+function makeEditor(host, code, opts={}){
+  host.classList.add("ed");
+  host.innerHTML = `<pre aria-hidden="true"><code></code></pre><textarea spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="${esc(opts.label || "Python code editor")}"></textarea>`;
+  const ta = $("textarea", host), pre = $("code", host);
+  ta.value = code;
+  let escMode = false;
+  const paint = () => { pre.innerHTML = hl(ta.value) + "\n"; };
+  const insert = txt => { ta.focus(); if (!document.execCommand || !document.execCommand("insertText", false, txt)) { ta.setRangeText(txt, ta.selectionStart, ta.selectionEnd, "end"); paint(); } };
+  ta.addEventListener("input", () => { paint(); if (opts.onChange) opts.onChange(ta.value); });
+  ta.addEventListener("keydown", e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); (e.shiftKey && opts.onCheck ? opts.onCheck : opts.onRun)?.(); return; }
+    if (e.key === "Escape") { escMode = true; return; }
+    if (e.key === "Tab" && !escMode) {
+      e.preventDefault();
+      const s = ta.selectionStart, v = ta.value, ls = v.lastIndexOf("\n", s - 1) + 1;
+      if (e.shiftKey) { const ind = v.slice(ls).match(/^ {1,4}/); if (ind) { ta.setSelectionRange(ls, ls + ind[0].length); insert(""); } }
+      else insert("    ");
+      return;
+    }
+    escMode = false;
+    if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      const s = ta.selectionStart, v = ta.value, ls = v.lastIndexOf("\n", s - 1) + 1, line = v.slice(ls, s);
+      let ind = line.match(/^\s*/)[0];
+      if (/:\s*(#.*)?$/.test(line)) ind += "    ";
+      if (ind) { e.preventDefault(); insert("\n" + ind); }
+    }
+  });
+  paint();
+  return { get: () => ta.value, set: v => { ta.value = v; paint(); if (opts.onChange) opts.onChange(v); }, focus: () => ta.focus() };
+}
+function codeBlock(code){ return `<pre class="codeblock">${hl(code)}</pre>`; }
+
+
+/* ---------- Python runner (Pyodide in a Web Worker) ---------- */
+const PYODIDE_URL = (window.PYODIDE_URL || "https://cdn.jsdelivr.net/pyodide/v0.27.2/full/");
+const WORKER_SRC = `
+let py = null;
+self.onmessage = async (e) => {
+  const m = e.data;
+  if (m.type === "init") {
+    try {
+      importScripts(m.url + "pyodide.js");
+      py = await loadPyodide({ indexURL: m.url });
+      await py.loadPackage(["numpy", "pandas"]);
+      py.runPython(m.harness);
+      self.postMessage({ type: "ready" });
+    } catch (err) { self.postMessage({ type: "fail", error: String((err && err.message) || err) }); }
+    return;
+  }
+  if (m.type === "prep") {
+    try { await py.loadPackagesFromImports(m.code); self.postMessage({ type: "prepped", id: m.id }); }
+    catch (err) { self.postMessage({ type: "prepped", id: m.id, error: String((err && err.message) || err) }); }
+    return;
+  }
+  if (m.type === "run") {
+    try {
+      py.globals.set("__payload", m.payload);
+      const r = py.runPython(m.mode === "grade" ? "grade(__payload)" : "run_code(__payload)");
+      self.postMessage({ type: "result", id: m.id, result: r });
+    } catch (err) {
+      self.postMessage({ type: "result", id: m.id, result: JSON.stringify({ out: "", err: String((err && err.message) || err), ok: false, msg: "" }) });
+    }
+  }
+};`;
+const Py = {
+  w: null, readyP: null, seq: 0, cbs: {}, chain: Promise.resolve(),
+  status(s, detail){
+    const p = $("#pyPill"); p.hidden = false; p.className = "pill " + s;
+    $("#pyTxt").textContent = { off: "not started", loading: "loading…", libs: "loading libraries…", ready: "ready", busy: "running…", error: "failed – tap to retry" }[s] || s;
+    p.title = detail || "In-browser Python (Pyodide)";
+  },
+  boot(){
+    if (this.readyP) return this.readyP;
+    this.status("loading", "Downloading Python, NumPy and Pandas (first time can take 20–40 seconds)");
+    this.readyP = new Promise((res, rej) => {
+      let w;
+      try { w = new Worker(URL.createObjectURL(new Blob([WORKER_SRC], { type: "text/javascript" }))); }
+      catch (e) { this.status("error", String(e)); this.readyP = null; rej(e); return; }
+      this.w = w;
+      w.onmessage = e => {
+        const m = e.data;
+        if (m.type === "ready") { this.status("ready"); res(); }
+        else if (m.type === "fail") { this.status("error", m.error); this.readyP = null; rej(new Error(m.error)); }
+        else if (m.type === "result" || m.type === "prepped") { const cb = this.cbs[m.id]; delete this.cbs[m.id]; if (cb) cb(m.type === "result" ? JSON.parse(m.result) : m); }
+      };
+      w.onerror = e => { this.status("error", e.message); this.readyP = null; rej(new Error(e.message || "Worker error")); };
+      w.postMessage({ type: "init", url: PYODIDE_URL, harness: window.PY_HARNESS });
+    });
+    return this.readyP;
+  },
+  run(mode, payload, importCode){
+    const job = async () => {
+      await this.boot();
+      this.status("libs", "Loading SciPy / statsmodels / SymPy / NetworkX if this code needs them (first time only)");
+      await new Promise(res => { const id = ++this.seq; this.cbs[id] = res; this.w.postMessage({ type: "prep", id, code: importCode }); });
+      this.status("busy");
+      return new Promise(res => {
+        const id = ++this.seq, limit = 60000;
+        const timer = setTimeout(() => {
+          delete this.cbs[id]; try { this.w.terminate(); } catch (e) {}
+          this.readyP = null; this.status("off");
+          res({ out: "", err: "Stopped: the code ran for more than 60 seconds (is there an infinite loop?). Python is restarting.", ok: false, msg: "" });
+          this.boot().catch(() => {});
+        }, limit);
+        this.cbs[id] = r => { clearTimeout(timer); this.status("ready"); res(r); };
+        this.w.postMessage({ type: "run", id, mode, payload });
+      });
+    };
+    const p = this.chain.then(job, job);
+    this.chain = p.catch(() => {});
+    return p;
+  }
+};
+$("#pyPill").addEventListener("click", () => { if ($("#pyPill").classList.contains("error")) Py.boot().catch(() => {}); });
+
+const norm = s => String(s || "").trim().split("\n").map(l => l.replace(/\s+$/, "")).join("\n");
+function showOut(box, r){
+  let h = "";
+  if (r.out) h += `<div class="out"><div class="out-h">Output</div><pre>${esc(r.out)}</pre></div>`;
+  if (r.err) h += `<div class="out"><div class="out-h">Error</div><pre class="err">${esc(r.err)}</pre></div>`;
+  if (!r.out && !r.err) h += `<div class="out"><div class="out-h">Output</div><pre class="muted">(nothing was printed – use print() to see values)</pre></div>`;
+  box.innerHTML = h;
+}
+function pyFailMsg(box, e){ box.innerHTML = `<div class="verdict no">Python could not start: ${esc(e.message || e)}. Check your internet connection and tap the Python status button to retry.</div>`; }
+const firstRunNote = () => Py.readyP ? "" : " (starting Python – the first run can take 20–40 seconds)";
+
+/* ---------- gate screens (sign-in, roster, verify) ---------- */
+function showGate(html){
+  $("#app").hidden = true; $("#menuBtn").hidden = true; $("#pyPill").hidden = true;
+  const g = $("#gate"); g.hidden = false; g.innerHTML = `<div class="gate">${html}</div>`;
+}
+function gateLoading(msg){ showGate(`<p class="muted">${esc(msg || "Loading…")}</p>`); }
+function gateSignIn(){
+  showGate(`<p class="kicker">Scientific Computing using Python · Unit 3</p>
+    <h1>SciPy, statsmodels, SymPy and NetworkX</h1>
+    <p class="lead">Learn with short theory and runnable examples, practise with quick checks, and submit marked tasks – all with real Python in your browser.</p>
+    <div class="auth"><h4>Sign in with your RRU Google account</h4>
+      <p class="small">Use the university email your teacher added to the class list (for example <code>name@student.rru.ac.in</code>).</p>
+      <button class="btn lg" id="siBtn">Sign in with Google</button>
+      <p class="small muted" id="siMsg" style="margin-top:8px"></p></div>
+    <p class="small muted">Poojan Shah · Assistant Professor, School of IT, AI &amp; Cyber Security · Rashtriya Raksha University</p>`);
+  $("#siBtn").onclick = signIn;
+  if (!window.FB) $("#siMsg").textContent = window.FB_ERROR ? "The sign-in service could not be reached. Check your internet connection and reload." : "Sign-in is not configured yet (config.js).";
+}
+function gateNotRoster(){
+  showGate(`<h2>You are not on the class list</h2>
+    <div class="auth"><p>You signed in as <b>${esc(USER.email)}</b>, but this email is not on the class roster.</p>
+    <ul class="small"><li>Make sure you used your <b>RRU email</b>, not a personal Gmail.</li><li>If it is the right email, ask your teacher to add you to the roster.</li></ul>
+    <button class="btn" id="soBtn">Sign out and try another account</button></div>`);
+  $("#soBtn").onclick = () => window.FB.signOut();
+}
+function gateVerify(){
+  const r = ROSTER;
+  showGate(`<p class="kicker">One-time verification</p><h2>Check your details</h2>
+    <div class="auth"><p class="small">These details come from the class roster. Please confirm they are correct.</p>
+    <table class="details"><tr><td>Name</td><td><b>${esc(r.name)}</b></td></tr><tr><td>Enrollment</td><td>${esc(r.enrollment)}</td></tr><tr><td>Class</td><td>${esc(r.cls)}</td></tr><tr><td>Email</td><td>${esc(r.email)}</td></tr></table>
+    <label class="small" style="display:flex;gap:8px;align-items:flex-start"><input type="checkbox" id="vChk" style="margin-top:5px"> I confirm that these are my details and I will submit only my own work.</label>
+    <div class="row" style="margin-top:12px"><button class="btn" id="vBtn" disabled>Confirm and continue</button><button class="btn ghost" id="vOut">Not me – sign out</button></div>
+    <p class="small muted" id="vMsg" style="margin-top:8px">If any detail is wrong, do not confirm – tell your teacher so they can correct the roster.</p></div>`);
+  $("#vChk").onchange = e => { $("#vBtn").disabled = !e.target.checked; };
+  $("#vOut").onclick = () => window.FB.signOut();
+  $("#vBtn").onclick = async () => {
+    $("#vBtn").disabled = true; $("#vMsg").textContent = "Saving…";
+    try { await window.FB.verify(USER.uid, ROSTER); PROFILE = await window.FB.getUser(USER.uid); await enterApp(); }
+    catch (e) { console.error(e); $("#vMsg").textContent = "Could not save: " + (e.code || e.message) + ". Ask your teacher to check the roster entry."; $("#vBtn").disabled = false; }
+  };
+}
+
+async function signIn(){
+  if (!window.FB) { toast("Sign-in is not available."); return; }
+  try { await window.FB.signIn(); } catch (e) { toast("Sign-in failed: " + (e.code || e.message)); }
+}
+
+async function onAuth(u){
+  USER = u; PROFILE = null; ROSTER = null; PROG = {}; SUBCODE = {};
+  IS_TEACHER = !!(u && TEACHERS.includes((u.email || "").toLowerCase()));
+  renderUser();
+  if (!u) { gateSignIn(); return; }
+  gateLoading("Checking the class roster…");
+  try {
+    if (IS_TEACHER) { await enterApp(); return; }
+    PROFILE = await window.FB.getUser(u.uid);
+    if (PROFILE) { await enterApp(); return; }
+    ROSTER = await window.FB.getRoster(u.email.toLowerCase());
+    if (!ROSTER) { gateNotRoster(); return; }
+    gateVerify();
+  } catch (e) {
+    console.error(e);
+    showGate(`<h2>Something went wrong</h2><div class="auth"><p>${esc(e.code || e.message)}</p><button class="btn" id="rl">Reload</button></div>`);
+    $("#rl").onclick = () => location.reload();
+  }
+}
+
+let unsubProg = null;
+async function enterApp(){
+  renderUser();
+  $("#gate").hidden = true; $("#app").hidden = false; $("#menuBtn").hidden = false;
+  if (!IS_TEACHER) {
+    if (unsubProg) unsubProg();
+    unsubProg = window.FB.watchProgress(USER.uid, docs => {
+      PROG = {}; docs.forEach(d => { PROG[d.topic] = d; if (!PROG[d.topic].items) PROG[d.topic].items = {}; });
+      refreshAll(true);
+    });
+    window.FB.myAttempts(USER.uid).then(list => { list.forEach(a => { SUBCODE[a.item] = a.code; }); }).catch(() => {});
+  }
+  renderToc(); show(location.hash.slice(1) || "home");
+}
+
+/* ---------- top bar user ---------- */
+function renderUser(){
+  const slot = $("#userSlot");
+  if (!USER) { slot.innerHTML = ""; return; }
+  const nm = IS_TEACHER ? "Teacher" : (PROFILE ? PROFILE.name : USER.email);
+  slot.innerHTML = `<button class="userbtn" id="userBtn" aria-haspopup="true"><span class="av">${esc((nm || "?").trim()[0].toUpperCase())}</span><span>${esc(nm)}</span></button>`;
+  $("#userBtn").onclick = e => {
+    e.stopPropagation();
+    const m = $("#userMenu");
+    m.innerHTML = `<div class="small" style="padding:4px 8px 8px"><b>${esc(nm)}</b><br><span class="muted">${esc(PROFILE ? PROFILE.enrollment + " · " + PROFILE.cls + " · " : "")}${esc(USER.email)}</span></div>
+      ${IS_TEACHER ? `<button id="mTeach">Teacher page</button>` : `<button id="mMarks">My marks</button>`}<button id="mOut">Sign out</button>`;
+    m.hidden = !m.hidden;
+    if ($("#mMarks")) $("#mMarks").onclick = () => { m.hidden = true; location.hash = "marks"; };
+    if ($("#mTeach")) $("#mTeach").onclick = () => { location.href = "teacher.html"; };
+    $("#mOut").onclick = async () => { m.hidden = true; await window.FB.signOut(); };
+  };
+}
+document.addEventListener("click", e => { const m = $("#userMenu"); if (!m.hidden && !m.contains(e.target)) m.hidden = true; });
+
+/* ---------- navigation ---------- */
+function topicStateLabel(t){
+  if (IS_TEACHER) return SETTINGS.open[t] ? "open" : "locked (preview)";
+  if (isFinal(t)) return "submitted";
+  return isOpen(t) ? "open" : "locked";
+}
+function renderToc(){
+  let h = `<ol><li><a href="#home" data-id="home"><span class="tick"></span><span>Home</span><span></span></a></li>${IS_TEACHER ? `<li><a href="teacher.html"><span class="tick"></span><span>Teacher page</span><span></span></a></li>` : `<li><a href="#marks" data-id="marks"><span class="tick"></span><span>My marks</span><span></span></a></li>`}</ol>`;
+  for (const T of TOPICS) {
+    const t = T.id, open = isOpen(t);
+    h += `<h4>${esc(T.title)} <span class="lock">${open ? (isFinal(t) ? "✓" : "") : "🔒"}</span></h4><ol>`;
+    h += `<li><a href="#topic-${t}" data-id="topic-${t}"><span class="tick"></span><span>Overview &amp; final submit</span><span class="cnt">${IS_TEACHER ? "" : topicAnswered(t) + "/" + TOPIC[t].tasks.length}</span></a></li>`;
+    if (open) for (const L of TOPIC[t].lessons) {
+      const done = L.tasks.length && L.tasks.every(x => submitted(x.id));
+      h += `<li><a href="#${L.id}" data-id="${L.id}"><span class="tick">${done ? "✓" : ""}</span><span>${esc(L.title)}</span><span class="cnt">${L.tasks.length && !IS_TEACHER ? L.tasks.filter(x => submitted(x.id)).length + "/" + L.tasks.length : ""}</span></a></li>`;
+    }
+    h += `</ol>`;
+  }
+  $("#toc").innerHTML = h; refreshTocCurrent();
+  const all = TOPICS.reduce((a, T) => a + TOPIC[T.id].tasks.length, 0);
+  const ans = IS_TEACHER ? 0 : TOPICS.reduce((a, T) => a + topicAnswered(T.id), 0);
+  $("#progBar").style.width = (all ? 100 * ans / all : 0).toFixed(1) + "%";
+}
+function refreshTocCurrent(){ $$(".toc a").forEach(a => { if (a.dataset.id === CURRENT) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); }); }
+
+/* ---------- pages ---------- */
+function topicCard(T){
+  const t = T.id, n = TOPIC[t].tasks.length, open = isOpen(t), fin = isFinal(t);
+  const st = fin ? `<span class="st done">✓ Final submitted${showResults(t) ? ` · score ${topicScore(t)}/${n}` : ""}</span>` : open ? `<span class="st open">● Open</span>` : `<span class="st locked">🔒 Locked by teacher</span>`;
+  return `<div class="tcard"><h3>${esc(T.title)}</h3>${st}<p>${esc(T.blurb)}</p>
+    <p class="small muted">${TOPIC[t].lessons.length} lessons · ${n} marked tasks (1 mark each)${!IS_TEACHER && open ? ` · ${topicAnswered(t)} submitted` : ""}</p>
+    <div class="row">${open ? `<a class="btn" href="#${TOPIC[t].lessons[0].id}">${fin ? "Review" : "Start / continue"}</a>` : ""}<a class="btn ghost" href="#topic-${t}">Overview</a></div></div>`;
+}
+function pageHome(){
+  const who = IS_TEACHER ? `<div class="teach">Teacher preview: you can see every topic, run code and view solutions. Submissions are disabled for teacher accounts. Open or lock topics on the <a href="teacher.html">teacher page</a>.</div>` : "";
+  return `<section class="sec">${who}
+    <p class="kicker">Scientific Computing using Python · Unit 3</p>
+    <h1>${IS_TEACHER ? "Unit 3 lessons" : "Welcome, " + esc(PROFILE.name.split(" ")[0])}</h1>
+    ${IS_TEACHER ? "" : `<p class="small muted">${esc(PROFILE.enrollment)} · ${esc(PROFILE.cls)} · ${esc(USER.email)}</p>`}
+    <p class="lead">Each topic opens when your teacher unlocks it in class. Read the theory, run the examples, try the quick checks, then submit the marked tasks.</p>
+    <div class="tcards">${TOPICS.map(topicCard).join("")}</div>
+    <h3>How marking works</h3>
+    <div class="steps">
+      <div><span class="st">1 · Run</span>Run your code as often as you like to see the output.</div>
+      <div><span class="st">2 · Submit</span>Press <b>Submit</b> on a task to save your answer. You can change and resubmit it until the final submission.</div>
+      <div><span class="st">3 · Final submit</span>When you are done with a topic, press <b>Final submit</b>. Blank tasks get 0. After this nothing can be changed.</div>
+      <div><span class="st">4 · Marks</span>Each task is worth 1 mark. Quick-check questions are practice only.</div>
+    </div>
+    <footer>Python runs in your browser using Pyodide. The first run downloads about 30 MB; SciPy, statsmodels, SymPy and NetworkX load the first time a lesson uses them.</footer></section>`;
+}
+function topicBar(t){
+  if (IS_TEACHER) return `<div class="teach">Teacher preview – this topic is <b>${SETTINGS.open[t] ? "open" : "locked"}</b> for students. Results and solutions are shown to you.</div>`;
+  const n = TOPIC[t].tasks.length, a = topicAnswered(t);
+  if (isFinal(t)) {
+    const when = PROG[t].finalAt ? new Date(PROG[t].finalAt).toLocaleString() : "";
+    return `<div class="topicbar final"><span class="tb-l">✓ <b>${esc(TOPIC[t].title)}</b> final submitted ${esc(when)} · ${a}/${n} tasks submitted${showResults(t) ? ` · <b>score ${topicScore(t)}/${n}</b>` : " · score will be shown when your teacher releases results"}</span></div>`;
+  }
+  return `<div class="topicbar"><span class="tb-l"><b>${esc(TOPIC[t].title)}</b> · ${a} of ${n} tasks submitted · 1 mark each</span><button class="btn" data-final="${t}">Final submit ${esc(TOPIC[t].title)}</button></div>`;
+}
+function pageTopic(t){
+  const T = TOPIC[t];
+  let h = `<section class="sec"><p class="kicker">Topic</p><h2>${esc(T.title)}</h2><p class="lead">${esc(T.blurb)}</p>`;
+  if (!isOpen(t)) {
+    h += `<div class="topicbar locked"><span class="tb-l">🔒 This topic is locked. Your teacher will open it in class.</span></div>`;
+    if (isFinal(t)) h += topicBar(t);
+    return h + `</section>`;
+  }
+  h += topicBar(t);
+  h += `<h3>Lessons</h3><ol class="plan">${T.lessons.map(L => `<li><a href="#${L.id}"><span class="n">${L.num}</span><b>${esc(L.title)}</b><span class="pc">${IS_TEACHER ? "" : L.tasks.filter(x => submitted(x.id)).length + "/" + L.tasks.length}</span><span class="meta">${L.tasks.length} marked tasks${L.mcq.length ? " · " + L.mcq.length + " quick checks" : ""}</span></a></li>`).join("")}</ol>`;
+  if (!IS_TEACHER) {
+    const rows = T.lessons.filter(L => L.tasks.length).map(L => { const miss = L.tasks.filter(x => !submitted(x.id)); return `<tr><td>${esc(L.title)}</td><td>${L.tasks.length - miss.length}/${L.tasks.length}</td><td>${miss.length ? miss.map(x => esc(x.t)).join(", ") : "—"}</td></tr>`; }).join("");
+    h += `<h3>Before you final-submit</h3><p class="small muted">Tasks you have not submitted will get 0 marks.</p><div class="tablewrap"><table class="marks"><tr><th>Lesson</th><th>Submitted</th><th>Not yet submitted</th></tr>${rows}</table></div>`;
+  }
+  return h + `</section>`;
+}
+function pageMarks(){
+  let rows = "", tot = 0, totMax = 0;
+  for (const T of TOPICS) {
+    const t = T.id, n = TOPIC[t].tasks.length;
+    const st = isFinal(t) ? "Final submitted" : isOpen(t) ? "Open – in progress" : "Locked";
+    const sc = showResults(t) ? `${topicScore(t)} / ${n}` : (isFinal(t) ? "Result not released yet" : "—");
+    if (showResults(t)) { tot += topicScore(t); }
+    totMax += n;
+    rows += `<tr><td><a href="#topic-${t}">${esc(T.title)}</a></td><td>${st}</td><td>${topicAnswered(t)} / ${n}</td><td>${sc}</td></tr>`;
+  }
+  return `<section class="sec"><p class="kicker">Marks</p><h2>My marks</h2>
+    <p class="small muted">${esc(PROFILE.name)} · ${esc(PROFILE.enrollment)} · ${esc(PROFILE.cls)}</p>
+    <div class="tablewrap"><table class="marks"><tr><th>Topic</th><th>Status</th><th>Submitted</th><th>Score</th></tr>${rows}</table></div>
+    <p class="small muted" style="margin-top:12px">Each task is worth 1 mark. Scores appear when your teacher shows results for a topic.</p></section>`;
+}
+function pageLocked(L){
+  return `<section class="sec"><p class="kicker">${esc(TOPIC[L.topic].title)}</p><h2>${esc(L.title)}</h2><div class="topicbar locked"><span class="tb-l">🔒 This topic is locked. Your teacher will open it in class.</span></div></section>`;
+}
+function pageLesson(L){
+  const T = TOPIC[L.topic], idx = T.lessons.indexOf(L), prev = T.lessons[idx - 1], next = T.lessons[idx + 1];
+  let h = `<section class="sec">${topicBar(L.topic)}
+    <p class="kicker">${esc(T.title)} · Lesson ${L.num}</p><h2>${esc(L.title)}</h2>
+    <div class="prose">${L.theory}</div>`;
+  if (L.syntax.length) h += `<h3>Syntax at a glance</h3><div class="tablewrap"><table class="syn">${L.syntax.map(([c, d]) => `<tr><td>${esc(c)}</td><td>${esc(d)}</td></tr>`).join("")}</table></div>`;
+  if (L.examples.length) {
+    h += `<h3>${L.examples.length > 1 ? "Run the examples" : "Run the example"}</h3><p class="small muted">Press <b>Run</b> and compare with the expected output. Then change the code and run again.</p>`;
+    L.examples.forEach((ex, i) => {
+      h += `<div class="card" data-ex="${i}"><div class="card-h"><span class="badge">EXAMPLE</span><b>${esc(ex.title)}</b></div><div class="edhost"></div>
+        <div class="actions"><button class="btn" data-act="run">▶ Run</button><button class="btn ghost" data-act="reset">Reset</button><span class="kbd">Ctrl + Enter to run</span></div>
+        <div class="res"></div>${ex.expected != null ? `<details class="exp"><summary>Expected output</summary><pre>${esc(ex.expected)}</pre></details>` : ""}</div>`;
+    });
+  }
+  if (L.mcq.length) { h += `<h3>Quick check <span class="small muted" style="font-family:var(--sans);font-weight:400">(practice – not marked)</span></h3>`; L.mcq.forEach(q => { h += `<div class="card mcq" id="${q.id}" data-mcq="${q.id}"></div>`; }); }
+  if (L.tasks.length) {
+    h += `<h3>Marked tasks <span class="small muted" style="font-family:var(--sans);font-weight:400">(1 mark each)</span></h3>
+      <p class="small muted">Write your code and press <b>Submit</b> to save your answer. Use the variable names given in the question. You can resubmit until you press <b>Final submit</b> for this topic.${SETTINGS.feedback[L.topic] || IS_TEACHER ? "" : " Results are hidden until your teacher releases them."}</p>`;
+    L.tasks.forEach(t => { h += `<div class="card task" id="${t.id}" data-task="${t.id}"></div>`; });
+  }
+  h += `<div class="nav2">${prev ? `<a href="#${prev.id}">← ${esc(prev.title)}</a>` : `<a href="#topic-${L.topic}">← ${esc(T.title)} overview</a>`}${next ? `<a href="#${next.id}">${esc(next.title)} →</a>` : `<a href="#topic-${L.topic}">Final submit ${esc(T.title)} →</a>`}</div></section>`;
+  return h;
+}
+
+function wireLesson(L, root){
+  L.examples.forEach((ex, i) => {
+    const card = $(`[data-ex="${i}"]`, root), res = $(".res", card);
+    const run = async () => {
+      const btn = $('[data-act="run"]', card); btn.disabled = true;
+      res.innerHTML = `<div class="verdict info">Running…${firstRunNote()}</div>`;
+      try {
+        const r = await Py.run("run", ed.get(), ed.get());
+        showOut(res, r);
+        if (ex.expected != null && !r.err) res.insertAdjacentHTML("beforeend", norm(r.out) === norm(ex.expected) ? `<div class="verdict ok">✓ Your output matches the expected output.</div>` : `<div class="verdict info">Your output differs from the expected output – expected if you changed the code.</div>`);
+      } catch (e) { pyFailMsg(res, e); }
+      btn.disabled = false;
+    };
+    const ed = makeEditor($(".edhost", card), ex.code, { onRun: run, label: "Example code" });
+    $('[data-act="run"]', card).onclick = run;
+    $('[data-act="reset"]', card).onclick = () => { ed.set(ex.code); res.innerHTML = ""; };
+  });
+  L.mcq.forEach((q, i) => renderMcq($(`[data-mcq="${q.id}"]`, root), q, i));
+  L.tasks.forEach((t, i) => renderTask($(`[data-task="${t.id}"]`, root), t, i, L));
+}
+
+function renderMcq(card, q, i){
+  const letters = "ABCDEFG", key = "u3-mcq-" + (USER ? USER.uid : "") + "-" + q.id;
+  const isCodeOpt = q.opts.some(o => /\n|^\[|^\(|^\d/.test(o));
+  const draw = (wrongs) => {
+    const ok = !!LS.get(key, false);
+    card.innerHTML = `<div class="card-h"><span class="badge">Q${i + 1}</span><b>Quick check</b><span class="status ${ok ? "done" : wrongs.length ? "tried" : ""}">${ok ? "✓ Correct" : wrongs.length ? wrongs.length + " wrong" : "Not answered"}</span></div>
+      <div>${q.q}</div>${q.code ? codeBlock(q.code) : ""}
+      <div class="opts">${q.opts.map((o, j) => `<button class="opt ${isCodeOpt ? "code" : ""} ${ok && j === q.a ? "right" : wrongs.includes(j) ? "wrong" : ""}" data-j="${j}" ${ok ? "disabled" : ""}><span class="l">${letters[j]}</span><span class="tx">${o.includes("<code>") ? o : esc(o)}</span></button>`).join("")}</div>
+      ${ok ? `<div class="why"><b>Why:</b> ${q.why}</div>` : wrongs.length ? `<div class="why" style="color:var(--red)">Not quite – try another option.${wrongs.length >= 2 ? ` <br><span style="color:var(--ink)"><b>Hint:</b> ${q.why}</span>` : ""}</div>` : ""}`;
+    $$(".opt", card).forEach(b => b.onclick = () => { const j = +b.dataset.j; if (j === q.a) LS.set(key, true); else wrongs.push(j); draw(wrongs); });
+  };
+  draw([]);
+}
+
+function renderTask(card, t, i, L){
+  const topic = L.topic, fin = isFinal(topic), canSubmit = !IS_TEACHER && isOpen(topic) && !fin;
+  const hintTxt = t.hint || (t.uses && t.uses.length ? "Use " + t.uses.map(u => "<code>" + esc(u) + "</code>").join(" and ") + " in your answer." : "");
+  const startCode = fin ? (SUBCODE[t.id] ?? LS.get("u3-sub-" + (USER ? USER.uid : "") + "-" + t.id, null) ?? "# No answer was submitted for this task.\n") : (LS.get(draftKey(t.id), null) ?? t.start);
+  card.innerHTML = `<div class="card-h"><span class="badge">TASK ${i + 1}</span><b>${esc(t.t)}</b><span class="small muted">1 mark</span><span class="status"></span></div>
+    <p class="task-q">${t.q}</p><div class="edhost"></div>
+    <div class="actions">
+      <button class="btn ghost" data-act="run">▶ Run</button>
+      ${canSubmit ? `<button class="btn ok" data-act="submit">Submit answer</button>` : ""}
+      ${IS_TEACHER ? `<button class="btn ok" data-act="check">✓ Check (teacher)</button>` : ""}
+      ${hintTxt && !fin ? `<button class="btn ghost" data-act="hint">Hint</button>` : ""}
+      ${showSolutions(topic) ? `<button class="btn ghost" data-act="sol">Solution</button>` : ""}
+      ${canSubmit ? `<button class="btn ghost" data-act="reset">Reset</button>` : ""}
+      <span class="kbd">${canSubmit ? "Ctrl + Enter run · Ctrl + Shift + Enter submit" : "Ctrl + Enter run"}</span>
+    </div><div class="res"></div><div class="extra"></div>`;
+  const res = $(".res", card), extra = $(".extra", card);
+  const st = () => {
+    const s = $(".status", card), r = rec(t.id);
+    if (IS_TEACHER) { s.className = "status"; s.textContent = "Teacher preview"; return; }
+    if (!r) { s.className = "status"; s.textContent = fin ? "Not submitted · 0" : "Not submitted"; return; }
+    if (showResults(topic)) { s.className = "status " + (r.ok ? "done" : "tried"); s.textContent = r.ok ? "✓ Correct · 1 mark" : "✗ Incorrect · 0"; }
+    else { s.className = "status done"; s.textContent = fin ? "Submitted" : "Submitted ✓"; }
+  };
+  const payload = code => JSON.stringify({ code, vars: t.vars || [], uses: t.uses || [], check: t.check || "", solution: t.solution, rtol: t.rtol || 0, atol: t.atol || 0 });
+  const run = async () => { res.innerHTML = `<div class="verdict info">Running…${firstRunNote()}</div>`; try { showOut(res, await Py.run("run", ed.get(), ed.get())); } catch (e) { pyFailMsg(res, e); } };
+  const grade = async () => Py.run("grade", payload(ed.get()), ed.get() + "\n" + t.solution);
+  const submit = async () => {
+    if (!canSubmit) return;
+    const b = $('[data-act="submit"]', card); b.disabled = true;
+    res.innerHTML = `<div class="verdict info">Checking and saving…${firstRunNote()}</div>`;
+    let r; try { r = await grade(); } catch (e) { pyFailMsg(res, e); b.disabled = false; return; }
+    showOut(res, r);
+    const prev = rec(t.id) || { tries: 0 };
+    const nr = { ok: !!r.ok, tries: (prev.tries || 0) + 1, at: Date.now() };
+    try {
+      await window.FB.submitTask(USER.uid, PROFILE, topic, t.id, nr, ed.get(), TOPIC[topic].tasks.length);
+      tp(topic).items[t.id] = nr; SUBCODE[t.id] = ed.get(); LS.set("u3-sub-" + USER.uid + "-" + t.id, ed.get());
+      if (showResults(topic)) res.insertAdjacentHTML("beforeend", `<div class="verdict ${r.ok ? "ok" : "no"}">${r.ok ? "✓ " : "✗ "}${esc(r.msg || "")}${r.ok ? "" : "\n\nYou can fix it and submit again."}</div>`);
+      else res.insertAdjacentHTML("beforeend", `<div class="verdict info">✓ Answer saved (submission ${nr.tries}). Results will be shown when your teacher releases them.</div>`);
+    } catch (e) {
+      console.error(e);
+      res.insertAdjacentHTML("beforeend", `<div class="verdict no">Your answer was NOT saved: ${esc(e.code === "permission-denied" ? "this topic is locked or already final-submitted." : (e.code || e.message))}</div>`);
+    }
+    st(); renderToc(); updateTopicBar(topic); b.disabled = false;
+  };
+  const teacherCheck = async () => { res.innerHTML = `<div class="verdict info">Checking…${firstRunNote()}</div>`; try { const r = await grade(); showOut(res, r); res.insertAdjacentHTML("beforeend", `<div class="verdict ${r.ok ? "ok" : "no"}">${r.ok ? "✓ " : "✗ "}${esc(r.msg || "")}</div>`); } catch (e) { pyFailMsg(res, e); } };
+  const ed = makeEditor($(".edhost", card), startCode, { onRun: run, onCheck: canSubmit ? submit : (IS_TEACHER ? teacherCheck : null), onChange: v => { if (canSubmit) LS.set(draftKey(t.id), v); }, label: "Code for task " + (i + 1) });
+  if (fin) $(".edhost", card).querySelector("textarea").readOnly = true;
+  $('[data-act="run"]', card).onclick = run;
+  if ($('[data-act="submit"]', card)) $('[data-act="submit"]', card).onclick = submit;
+  if ($('[data-act="check"]', card)) $('[data-act="check"]', card).onclick = teacherCheck;
+  const hb = $('[data-act="hint"]', card); if (hb) hb.onclick = () => { extra.innerHTML = `<div class="hintbox"><b>Hint:</b> ${hintTxt}</div>`; };
+  const sb = $('[data-act="sol"]', card); if (sb) sb.onclick = () => { extra.innerHTML = `<div class="solbox"><div class="lbl">REFERENCE SOLUTION</div>${codeBlock(t.solution)}</div>`; };
+  const rb = $('[data-act="reset"]', card); if (rb) rb.onclick = () => { if (confirm("Reset this task to the starting code? Your current code will be lost (your last submitted answer stays saved).")) { ed.set(t.start); LS.del(draftKey(t.id)); res.innerHTML = ""; extra.innerHTML = ""; } };
+  st();
+}
+function updateTopicBar(t){ $$(".topicbar, .teach").forEach(el => { if (el.closest("#main")) { const tmp = document.createElement("div"); tmp.innerHTML = topicBar(t); el.replaceWith(tmp.firstElementChild); } }); wireFinal(); }
+
+/* ---------- final submission ---------- */
+function wireFinal(){ $$("[data-final]").forEach(b => b.onclick = () => openFinal(b.dataset.final)); }
+function openFinal(t){
+  const n = TOPIC[t].tasks.length, a = topicAnswered(t), dlg = $("#dlg");
+  dlg.innerHTML = `<h3 style="margin-top:0;border:0;padding:0">Final submit ${esc(TOPIC[t].title)}?</h3>
+    <p>You have submitted <b>${a} of ${n}</b> tasks.${a < n ? ` The <b>${n - a}</b> tasks you have not submitted will get <b>0 marks</b>.` : ""}</p>
+    <p><b>After final submission you cannot change any answer in this topic.</b></p>
+    <label class="small" style="display:flex;gap:8px"><input type="checkbox" id="fChk"> I understand – submit my ${esc(TOPIC[t].title)} work now.</label>
+    <div class="row"><button class="btn" id="fGo" disabled>Final submit</button><button class="btn ghost" id="fNo">Cancel</button></div><p class="small muted" id="fMsg"></p>`;
+  dlg.showModal();
+  $("#fChk").onchange = e => { $("#fGo").disabled = !e.target.checked; };
+  $("#fNo").onclick = () => dlg.close();
+  $("#fGo").onclick = async () => {
+    $("#fGo").disabled = true; $("#fMsg").textContent = "Submitting…";
+    try {
+      await window.FB.finalSubmit(USER.uid, PROFILE, t, topicScore(t), n);
+      tp(t).final = true; tp(t).finalAt = Date.now(); tp(t).score = topicScore(t); tp(t).total = n;
+      dlg.close(); toast(TOPIC[t].title + " final submitted."); refreshAll(false);
+    } catch (e) { console.error(e); $("#fMsg").textContent = "Could not submit: " + (e.code === "permission-denied" ? "this topic is locked or already submitted." : (e.code || e.message)); $("#fGo").disabled = false; }
+  };
+}
+
+/* ---------- router ---------- */
+let RENDERED = "";
+function show(id, opt = {}){
+  if ($("#app").hidden) return;
+  const [page, anchor] = (id || "home").split("/");
+  const main = $("#main"), y = scrollY;
+  let html, wire = null, key;
+  if (LESSON[page]) {
+    const L = LESSON[page]; CURRENT = page;
+    if (!isOpen(L.topic)) { html = pageLocked(L); key = page + ":locked"; }
+    else { html = pageLesson(L); wire = () => { wireLesson(L, main); wireFinal(); Py.boot().catch(() => {}); }; key = page + ":" + isFinal(L.topic) + ":" + showResults(L.topic) + ":" + showSolutions(L.topic); }
+  } else if (page.startsWith("topic-") && TOPIC[page.slice(6)]) { CURRENT = page; html = pageTopic(page.slice(6)); wire = wireFinal; key = "x" + Math.random(); }
+  else if (page === "marks" && !IS_TEACHER) { CURRENT = "marks"; html = pageMarks(); key = "x" + Math.random(); }
+  else { CURRENT = "home"; html = pageHome(); key = "x" + Math.random(); }
+  if (opt.soft && key === RENDERED) { refreshTocCurrent(); return; }
+  RENDERED = key;
+  main.innerHTML = html; if (wire) wire();
+  refreshTocCurrent();
+  document.title = (LESSON[CURRENT] ? LESSON[CURRENT].title + " · " : "") + "Scientific Python Lab – Unit 3";
+  document.body.classList.remove("nav-open");
+  if (opt.noScroll || opt.soft) scrollTo(0, y);
+  else if (anchor && document.getElementById(anchor)) setTimeout(() => document.getElementById(anchor).scrollIntoView({ block: "start" }), 30);
+  else scrollTo(0, 0);
+}
+function refreshAll(soft){ if ($("#app").hidden) return; renderToc(); show(location.hash.slice(1), { soft: !!soft, noScroll: true }); }
+addEventListener("hashchange", () => show(location.hash.slice(1)));
+
+/* ---------- chrome ---------- */
+$("#menuBtn").onclick = () => document.body.classList.toggle("nav-open");
+$("#scrim").onclick = () => document.body.classList.remove("nav-open");
+$("#themeBtn").onclick = () => {
+  const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const nx = cur === "dark" ? "light" : "dark"; document.documentElement.dataset.theme = nx; LS.set("u3-theme", nx);
+};
+{ const th = LS.get("u3-theme"); if (th) document.documentElement.dataset.theme = th; }
+gateLoading("Loading…");
+
+addEventListener("fb-ready", () => {
+  if (!window.FB) { gateSignIn(); return; }
+  window.FB.watchSettings(s => {
+    const before = JSON.stringify(SETTINGS);
+    SETTINGS = { open: s.open || {}, feedback: s.feedback || {}, solutions: s.solutions || {} };
+    if (before !== JSON.stringify(SETTINGS)) refreshAll(true);
+  });
+  window.FB.onChange(onAuth);
+});
+</script>
+<script type="module">
+/* Firebase connection */
+const V = "10.12.2";
+const cfg = window.FIREBASE_CONFIG || {};
+async function boot(){
+  if (window.FB_MOCK) { window.FB = window.FB_MOCK; return; }
+  if (!cfg.apiKey || String(cfg.apiKey).startsWith("PASTE")) { window.FB = null; return; }
+  try {
+    const A = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-app.js`);
+    const U = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-auth.js`);
+    const D = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-firestore.js`);
+    const app = A.initializeApp(cfg);
+    const auth = U.getAuth(app); const db = D.getFirestore(app);
+    const provider = new U.GoogleAuthProvider(); provider.setCustomParameters({ prompt: "select_account" });
+    try { await U.getRedirectResult(auth); } catch (e) {}
+    const get1 = async (c, id) => { const s = await D.getDoc(D.doc(db, c, id)); return s.exists() ? s.data() : null; };
+    let unsubSettings = null;
+    window.FB = {
+      onChange: cb => U.onAuthStateChanged(auth, cb),
+      signIn: async () => {
+        try { await U.signInWithPopup(auth, provider); }
+        catch (e) {
+          if (["auth/popup-blocked", "auth/operation-not-supported-in-this-environment", "auth/cancelled-popup-request"].includes(e.code)) await U.signInWithRedirect(auth, provider);
+          else if (e.code !== "auth/popup-closed-by-user") throw e;
+        }
+      },
+      signOut: () => U.signOut(auth),
+      getRoster: email => get1("roster", email),
+      getUser: uid => get1("users", uid),
+      verify: (uid, r) => D.setDoc(D.doc(db, "users", uid), { uid, email: r.email, name: r.name, enrollment: r.enrollment, cls: r.cls, verifiedAt: D.serverTimestamp() }),
+      watchSettings: cb => {
+        // settings are readable only after sign-in; re-subscribe whenever the user changes
+        U.onAuthStateChanged(auth, u => {
+          if (unsubSettings) { unsubSettings(); unsubSettings = null; }
+          if (!u) { cb({}); return; }
+          unsubSettings = D.onSnapshot(D.doc(db, "settings", "course"), s => cb(s.exists() ? s.data() : {}), e => console.error(e));
+        });
+      },
+      watchProgress: (uid, cb) => D.onSnapshot(D.query(D.collection(db, "progress"), D.where("uid", "==", uid)), s => cb(s.docs.map(d => { const x = d.data(); if (x.finalAt && x.finalAt.toMillis) x.finalAt = x.finalAt.toMillis(); return x; })), e => console.error(e)),
+      myAttempts: async uid => (await D.getDocs(D.query(D.collection(db, "attempts"), D.where("uid", "==", uid)))).docs.map(d => d.data()),
+      submitTask: async (uid, p, topic, item, rec, code, total) => {
+        const b = D.writeBatch(db);
+        b.set(D.doc(db, "attempts", `${uid}__${item}`), { uid, topic, item, ok: rec.ok, tries: rec.tries, code: String(code).slice(0, 19000), at: D.serverTimestamp() });
+        b.set(D.doc(db, "progress", `${uid}__${topic}`), { uid, topic, email: p.email, name: p.name, enrollment: p.enrollment, cls: p.cls, items: { [item]: rec }, final: false, total, updatedAt: D.serverTimestamp() }, { merge: true });
+        await b.commit();
+      },
+      finalSubmit: (uid, p, topic, score, total) => D.setDoc(D.doc(db, "progress", `${uid}__${topic}`), { uid, topic, email: p.email, name: p.name, enrollment: p.enrollment, cls: p.cls, final: true, finalAt: D.serverTimestamp(), score, total, updatedAt: D.serverTimestamp() }, { merge: true })
+    };
+  } catch (e) { console.error("Firebase failed to load", e); window.FB = null; window.FB_ERROR = String(e); }
+}
+await boot();
+window.dispatchEvent(new Event("fb-ready"));
+</script>
+</body>
+</html>
