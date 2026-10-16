@@ -18,5 +18,3 @@ window.FIREBASE_CONFIG = {
    Keep this list the same as spIsTeacher() / isTeacher() in firestore.rules. */
 window.TEACHERS = ["poojan.shah@rru.ac.in"];
 
-};
-
