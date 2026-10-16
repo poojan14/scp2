@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teacher Page · Scientific Python Lab – Unit 3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600&family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FFFFFF; --surface:#F5F7FA; --line:#DCE3EB; --ink:#1A2433; --ink-2:#4A5568; --muted:#6B778A; --blue:#1F4E8C; --blue-soft:#E7EFF9; --green:#2E7D5B; --green-soft:#E6F3EC; --red:#B4472F; --red-soft:#FBEAE5; --amber:#8A5A00; --amber-soft:#FFF4D6;
+  --serif:"Source Serif 4", Georgia, serif; --sans:"Source Sans 3", "Segoe UI", Arial, sans-serif; --mono:"Source Code Pro", Consolas, monospace; color-scheme:light}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#151A21; --surface:#1C232C; --line:#2F3B49; --ink:#E6EBF1; --ink-2:#B8C2CF; --muted:#8C99A9; --blue:#7FAEE8; --blue-soft:#1F3049; --green:#6CC59B; --green-soft:#1C3328; --red:#EC8A72; --red-soft:#3A2420; --amber:#E8B95A; --amber-soft:#3A3018; color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#151A21; --surface:#1C232C; --line:#2F3B49; --ink:#E6EBF1; --ink-2:#B8C2CF; --muted:#8C99A9; --blue:#7FAEE8; --blue-soft:#1F3049; --green:#6CC59B; --green-soft:#1C3328; --red:#EC8A72; --red-soft:#3A2420; --amber:#E8B95A; --amber-soft:#3A3018; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.5}
+button,input,select,textarea{font:inherit; color:inherit}
+[hidden]{display:none !important}
+.top{display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:12px 18px; border-bottom:1px solid var(--line); position:sticky; top:0; background:var(--bg); z-index:5}
+.top h1{font-family:var(--serif); font-size:20px; margin:0; flex:1; min-width:220px}
+.who{color:var(--muted); font-size:14px}
+main{padding:18px; max-width:1500px; margin:0 auto}
+.card{border:1px solid var(--line); border-radius:12px; padding:16px 18px; background:var(--surface); max-width:680px}
+.btn{border:1px solid var(--blue); background:var(--blue); color:#fff; border-radius:8px; padding:6px 14px; cursor:pointer; font-weight:600; font-size:15px; text-decoration:none; display:inline-block}
+:root[data-theme="dark"] .btn{color:#10161D}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn{color:#10161D}}
+.btn.ghost{background:transparent; color:var(--blue) !important; border-color:var(--line)}
+.btn.danger{background:transparent; color:var(--red) !important; border-color:var(--red)}
+.btn.sm{padding:3px 10px; font-size:14px}
+.btn:disabled{opacity:.45; cursor:default}
+.stats{display:flex; gap:26px; flex-wrap:wrap; margin:6px 0 14px}
+.stats b{display:block; font-family:var(--serif); font-size:30px; color:var(--blue); line-height:1.1}
+.stats span{font-size:14px; color:var(--ink-2)}
+.tools{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:10px 0}
+.tools input,.tools select,textarea{border:1px solid var(--line); border-radius:8px; padding:6px 10px; background:var(--bg)}
+.tabs{display:flex; gap:4px; border-bottom:1px solid var(--line); margin:14px 0 12px; flex-wrap:wrap}
+.tabs button{border:0; background:none; padding:8px 14px; cursor:pointer; border-bottom:3px solid transparent; font-weight:600; color:var(--muted)}
+.tabs button[aria-selected="true"]{color:var(--blue); border-color:var(--blue)}
+.wrap{overflow-x:auto; border:1px solid var(--line); border-radius:10px}
+table{border-collapse:collapse; width:100%; font-size:14.5px}
+th,td{padding:6px 10px; border-bottom:1px solid var(--line); text-align:left; white-space:nowrap; vertical-align:top}
+th{background:var(--surface); position:sticky; top:0; cursor:pointer; user-select:none; font-size:13px; color:var(--ink-2)}
+tbody tr:hover{background:var(--surface)}
+td.num{text-align:right; font-variant-numeric:tabular-nums}
+.link{color:var(--blue); cursor:pointer; text-decoration:underline}
+.muted{color:var(--muted)}
+.ok{color:var(--green); font-weight:600} .tr{color:var(--amber)} .no{color:var(--muted)} .bad{color:var(--red)}
+.tgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:14px}
+.tcard{border:1px solid var(--line); border-radius:12px; padding:14px 16px; background:var(--bg)}
+.tcard h3{margin:0 0 4px; font-family:var(--serif); font-size:21px}
+.tcard.open{border-color:var(--green); box-shadow:0 0 0 1px var(--green) inset}
+.sw{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 0; border-top:1px dashed var(--line)}
+.sw label{font-size:15px} .sw small{display:block; color:var(--muted); font-size:13px}
+.switch{position:relative; width:46px; height:26px; flex:none}
+.switch input{opacity:0; width:0; height:0}
+.switch span{position:absolute; inset:0; background:var(--line); border-radius:99px; cursor:pointer; transition:.2s}
+.switch span::before{content:""; position:absolute; width:20px; height:20px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.2s; box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.switch input:checked + span{background:var(--green)}
+.switch input:checked + span::before{transform:translateX(20px)}
+.badge{display:inline-block; font-size:12.5px; font-weight:700; border-radius:4px; padding:1px 8px}
+.badge.open{background:var(--green-soft); color:var(--green)} .badge.locked{background:var(--amber-soft); color:var(--amber)}
+.drop{border:2px dashed var(--line); border-radius:12px; padding:16px; text-align:center; background:var(--surface); margin:8px 0}
+.drop.over{border-color:var(--blue); background:var(--blue-soft)}
+.err{background:var(--red-soft)} .warn{background:var(--amber-soft)}
+dialog{border:1px solid var(--line); border-radius:12px; padding:0; width:min(1000px,96vw); max-height:90vh; background:var(--bg); color:var(--ink)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.dh{display:flex; gap:10px; align-items:center; padding:12px 18px; border-bottom:1px solid var(--line); position:sticky; top:0; background:var(--bg); flex-wrap:wrap}
+.dh h2{margin:0; font-size:19px; flex:1; font-family:var(--serif)}
+.db{padding:14px 18px 22px}
+.les{margin:16px 0 4px; font-weight:700; display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+.it{display:grid; grid-template-columns:90px 1fr 140px 80px; gap:8px; padding:4px 0; border-bottom:1px dashed var(--line); font-size:14.5px}
+pre.code{grid-column:1/-1; background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:8px 10px; margin:4px 0 8px; font-family:var(--mono); font-size:13px; white-space:pre-wrap}
+.toast{position:fixed; left:50%; bottom:20px; transform:translateX(-50%); background:var(--ink); color:var(--bg); padding:8px 16px; border-radius:8px; opacity:0; transition:opacity .2s; pointer-events:none; z-index:50}
+.toast.show{opacity:1}
+.live{display:inline-flex; align-items:center; gap:6px; font-size:13px; color:var(--green)} .live i{width:8px; height:8px; border-radius:50%; background:var(--green)}
+</style>
+</head>
+<body>
+<header class="top"><h1>Scientific Python Lab – Unit 3 · Teacher page</h1><span class="live" id="live" hidden><i></i>live</span><span class="who" id="who"></span><span id="topBtns"></span><a class="btn ghost" href="index.html">Open student site</a></header>
+<main id="main"><p class="muted">Loading…</p></main>
+<dialog id="dlg"></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="config.js"></script>
+<script src="content.js"></script>
+<script type="module">
+const V = "10.12.2";
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const toast = m => { const t = $("#toast"); t.textContent = m; t.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("show"), 2500); };
+const main = $("#main");
+if (!Array.isArray(window.COURSE)) { main.innerHTML = `<div class="card"><h2>Course content not found</h2><p>teacher.html needs <b>content.js</b> and <b>config.js</b> in the same folder.</p></div>`; throw new Error("content.js missing"); }
+const C = window.COURSE, TOPICS = window.TOPICS;
+const TEACHERS = (window.TEACHERS || []).map(s => s.toLowerCase());
+const TOPIC = {}; TOPICS.forEach(t => TOPIC[t.id] = Object.assign({}, t, { lessons: [], tasks: [] }));
+const TASK = {};
+C.forEach(L => { TOPIC[L.topic].lessons.push(L); L.num = TOPIC[L.topic].lessons.length; L.tasks.forEach((t, i) => { TOPIC[L.topic].tasks.push(t.id); TASK[t.id] = { L, n: i + 1, t }; }); });
+const ALLMAX = TOPICS.reduce((a, t) => a + TOPIC[t.id].tasks.length, 0);
+
+const cfg = window.FIREBASE_CONFIG || {};
+if (!cfg.apiKey || String(cfg.apiKey).startsWith("PASTE")) { main.innerHTML = `<div class="card"><h2>Not connected</h2><p>Paste your Firebase web config into <code>config.js</code> first. See SETUP.md.</p></div>`; throw new Error("no config"); }
+const A = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-app.js`);
+const U = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-auth.js`);
+const D = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-firestore.js`);
+const app = A.initializeApp(cfg); const auth = U.getAuth(app); const db = D.getFirestore(app);
+const provider = new U.GoogleAuthProvider(); provider.setCustomParameters({ prompt: "select_account" });
+try { await U.getRedirectResult(auth); } catch (e) {}
+
+let SETTINGS = { open: {}, feedback: {}, solutions: {} }, ROSTER = [], USERS = {}, PROGRESS = [], TAB = "topics", SORT = { k: "enrollment", dir: 1 };
+let unsubs = [];
+
+U.onAuthStateChanged(auth, async u => {
+  unsubs.forEach(f => f()); unsubs = [];
+  if (!u) {
+    $("#who").textContent = ""; $("#topBtns").innerHTML = ""; $("#live").hidden = true;
+    main.innerHTML = `<div class="card"><h2>Teacher sign-in</h2><p>Only teacher accounts listed in the Firestore rules can use this page.</p><button class="btn" id="si">Sign in with Google</button></div>`;
+    $("#si").onclick = async () => { try { await U.signInWithPopup(auth, provider); } catch (e) { if (e.code === "auth/popup-blocked") U.signInWithRedirect(auth, provider); else if (e.code !== "auth/popup-closed-by-user") toast(e.code || e.message); } };
+    return;
+  }
+  $("#who").textContent = u.email;
+  $("#topBtns").innerHTML = `<button class="btn ghost" id="so">Sign out</button>`;
+  $("#so").onclick = () => U.signOut(auth);
+  if (!TEACHERS.includes(u.email.toLowerCase())) { main.innerHTML = notAuth(u.email, "This email is not in TEACHERS in config.js."); return; }
+  main.innerHTML = `<p class="muted">Loading class data…</p>`;
+  const fail = e => { console.error(e); main.innerHTML = notAuth(u.email, e.code || e.message); };
+  let first = 0; const ready = () => { if (++first >= 4) { $("#live").hidden = false; render(); } else if (first > 4) draw(); };
+  unsubs.push(D.onSnapshot(D.doc(db, "settings", "course"), s => { const d = s.exists() ? s.data() : {}; SETTINGS = { open: d.open || {}, feedback: d.feedback || {}, solutions: d.solutions || {} }; first >= 4 ? draw() : ready(); }, fail));
+  unsubs.push(D.onSnapshot(D.collection(db, "roster"), s => { ROSTER = s.docs.map(d => d.data()); first >= 4 ? draw() : ready(); }, fail));
+  unsubs.push(D.onSnapshot(D.collection(db, "users"), s => { USERS = {}; s.docs.forEach(d => { const x = d.data(); USERS[x.email] = x; }); first >= 4 ? draw() : ready(); }, fail));
+  unsubs.push(D.onSnapshot(D.collection(db, "progress"), s => { PROGRESS = s.docs.map(d => d.data()); first >= 4 ? draw() : ready(); }, fail));
+});
+function notAuth(email, why){ return `<div class="card"><h2>Not authorised</h2><p>${esc(email)} is not a teacher account for this site, or the Firestore rules are not published yet.</p><p class="muted">${esc(why)}</p><p>Add the email to <code>isTeacher()</code> in firestore.rules and to <code>TEACHERS</code> in config.js.</p></div>`; }
+
+/* ---------- derived data ---------- */
+function students(){
+  const byEmail = {};
+  for (const r of ROSTER) byEmail[r.email] = { email: r.email, name: r.name, enrollment: r.enrollment, cls: r.cls, inRoster: true };
+  for (const u of Object.values(USERS)) { byEmail[u.email] = Object.assign(byEmail[u.email] || { email: u.email, name: u.name, enrollment: u.enrollment, cls: u.cls, inRoster: false }, { uid: u.uid, verified: true }); }
+  const prog = {}; for (const p of PROGRESS) { (prog[p.uid] = prog[p.uid] || {})[p.topic] = p; }
+  return Object.values(byEmail).map(s => {
+    s.topics = {}; let tot = 0, last = 0;
+    for (const T of TOPICS) {
+      const p = (s.uid && prog[s.uid] && prog[s.uid][T.id]) || null, items = (p && p.items) || {};
+      const ids = TOPIC[T.id].tasks, sub = ids.filter(id => items[id]).length, score = ids.filter(id => items[id] && items[id].ok).length;
+      s.topics[T.id] = { p, items, sub, score, final: !!(p && p.final), finalAt: p && p.finalAt };
+      tot += score;
+      for (const v of Object.values(items)) last = Math.max(last, v.at || 0);
+    }
+    s.total = tot; s.last = last; return s;
+  });
+}
+const fmt = t => { if (!t) return "–"; const ms = t.toMillis ? t.toMillis() : t; return new Date(ms).toLocaleString([], { dateStyle: "medium", timeStyle: "short" }); };
+
+/* ---------- layout ---------- */
+function render(){
+  main.innerHTML = `<div class="stats" id="stats"></div>
+    <div class="tabs" role="tablist">${[["topics", "Topics: lock / open"], ["roster", "Roster"], ["marks", "Students & marks"], ["tasks", "Task analysis"]].map(([k, l]) => `<button role="tab" data-t="${k}" aria-selected="${TAB === k}">${l}</button>`).join("")}</div>
+    <div id="view"></div>`;
+  $$(".tabs button").forEach(b => b.onclick = () => { TAB = b.dataset.t; $$(".tabs button").forEach(x => x.setAttribute("aria-selected", x.dataset.t === TAB)); draw(true); });
+  draw(true);
+}
+function draw(full){
+  if (!$("#view")) return;
+  const S = students(), verified = S.filter(s => s.verified).length;
+  $("#stats").innerHTML = `<div><b>${ROSTER.length}</b><span>on roster</span></div><div><b>${verified}</b><span>verified &amp; signed in</span></div><div><b>${TOPICS.filter(t => SETTINGS.open[t.id]).length}/${TOPICS.length}</b><span>topics open</span></div><div><b>${ALLMAX}</b><span>marked tasks (1 mark each)</span></div>`;
+  if (TAB === "roster" && !full && $("#rosterArea")) { drawRosterTable(); return; }
+  if (TAB === "topics") drawTopics(S); else if (TAB === "roster") drawRoster(); else if (TAB === "marks") drawMarks(S); else drawTasks(S);
+}
+
+/* ---------- topics ---------- */
+async function setFlag(kind, topic, val){
+  try { await D.setDoc(D.doc(db, "settings", "course"), { [kind]: { [topic]: val }, updatedAt: D.serverTimestamp() }, { merge: true }); toast(`${TOPIC[topic].title}: ${kind === "open" ? (val ? "opened" : "locked") : kind === "feedback" ? (val ? "results shown on submit" : "results hidden on submit") : (val ? "results & solutions released" : "results & solutions hidden")}`); }
+  catch (e) { toast("Could not save: " + (e.code || e.message)); }
+}
+function drawTopics(S){
+  const v = $("#view");
+  v.innerHTML = `<p class="muted">Students only see a topic's lessons, and can only submit, while it is <b>open</b>. Changes reach every student's screen within a few seconds.</p>
+    <div class="tools"><button class="btn ghost" id="openAll">Open all</button><button class="btn ghost" id="lockAll">Lock all</button></div>
+    <div class="tgrid">${TOPICS.map(T => { const t = T.id, n = TOPIC[t].tasks.length, open = !!SETTINGS.open[t];
+      const ver = S.filter(s => s.verified), started = ver.filter(s => s.topics[t].sub > 0).length, fin = ver.filter(s => s.topics[t].final);
+      const avg = fin.length ? (fin.reduce((a, s) => a + s.topics[t].score, 0) / fin.length).toFixed(1) : "–";
+      return `<div class="tcard ${open ? "open" : ""}"><h3>${esc(T.title)} <span class="badge ${open ? "open" : "locked"}">${open ? "OPEN" : "LOCKED"}</span></h3>
+        <div class="muted" style="font-size:14px">${TOPIC[t].lessons.length} lessons · ${n} marked tasks · ${started} started · ${fin.length} final-submitted · avg final score ${avg}/${n}</div>
+        ${sw("open", t, open, "Open for students", "Students can see the lessons and submit tasks")}
+        ${sw("feedback", t, !!SETTINGS.feedback[t], "Show correct / incorrect on Submit", "Off = exam mode: answers are saved but results stay hidden")}
+        ${sw("solutions", t, !!SETTINGS.solutions[t], "Release results & solutions", "Students who final-submitted see their score and the reference solutions")}
+      </div>`; }).join("")}</div>`;
+  $$("[data-sw]").forEach(i => i.onchange = () => setFlag(i.dataset.sw, i.dataset.topic, i.checked));
+  $("#openAll").onclick = async () => { if (confirm("Open all topics for students?")) for (const T of TOPICS) await setFlag("open", T.id, true); };
+  $("#lockAll").onclick = async () => { if (confirm("Lock all topics?")) for (const T of TOPICS) await setFlag("open", T.id, false); };
+}
+const sw = (kind, t, on, label, help) => `<div class="sw"><label for="sw-${kind}-${t}">${label}<small>${help}</small></label><label class="switch"><input type="checkbox" id="sw-${kind}-${t}" data-sw="${kind}" data-topic="${t}" ${on ? "checked" : ""}><span></span></label></div>`;
+
+/* ---------- roster ---------- */
+let PREVIEW = null;
+function parseCSV(text){
+  const rows = []; let row = [], f = "", q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) { if (c === '"') { if (text[i + 1] === '"') { f += '"'; i++; } else q = false; } else f += c; }
+    else if (c === '"') q = true;
+    else if (c === "," || c === ";" || c === "\t") { row.push(f); f = ""; }
+    else if (c === "\n" || c === "\r") { if (c === "\r" && text[i + 1] === "\n") i++; row.push(f); rows.push(row); row = []; f = ""; }
+    else f += c;
+  }
+  if (f !== "" || row.length) { row.push(f); rows.push(row); }
+  return rows.map(r => r.map(x => x.trim())).filter(r => r.some(x => x));
+}
+function buildPreview(text){
+  const rows = parseCSV(text.replace(/^﻿/, ""));
+  if (!rows.length) return { error: "The file is empty." };
+  const h = rows[0].map(x => x.toLowerCase().replace(/[^a-z]/g, ""));
+  const find = (...names) => h.findIndex(x => names.includes(x));
+  let ie = find("email", "emailid", "mail", "emailaddress"), iN = find("name", "fullname", "studentname"), iEn = find("enrollment", "enrollmentno", "enrolment", "enrollmentnumber", "enrolmentno", "rollno", "roll", "enrno", "enrollno"), iC = find("class", "cls", "division", "section", "batch", "program");
+  let data = rows.slice(1);
+  if (ie < 0 && rows[0].some(x => x.includes("@"))) { ie = 0; iN = 1; iEn = 2; iC = 3; data = rows; }
+  if (ie < 0 || iN < 0 || iEn < 0 || iC < 0) return { error: `Could not find all four columns. The first row must be a header: email, name, enrollment, class. Found: ${rows[0].join(", ")}` };
+  const seen = new Set(), seenEnr = new Set(), out = [];
+  for (const r of data) {
+    const e = (r[ie] || "").toLowerCase(), item = { email: e, name: (r[iN] || "").replace(/\s+/g, " "), enrollment: (r[iEn] || "").toUpperCase(), cls: r[iC] || "", problem: "" };
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) item.problem = "invalid email";
+    else if (!item.name || !item.enrollment || !item.cls) item.problem = "missing name / enrollment / class";
+    else if (seen.has(e)) item.problem = "duplicate email in file";
+    else if (seenEnr.has(item.enrollment)) item.problem = "duplicate enrollment in file";
+    seen.add(e); seenEnr.add(item.enrollment);
+    const existing = ROSTER.find(x => x.email === e);
+    item.change = item.problem ? "skip" : !existing ? "new" : (existing.name === item.name && existing.enrollment === item.enrollment && existing.cls === item.cls ? "same" : "update");
+    if (item.change === "update" && USERS[e]) item.warn = "already verified – details on their account will not change unless you reset verification";
+    out.push(item);
+  }
+  return { rows: out };
+}
+function drawRoster(){
+  const v = $("#view");
+  v.innerHTML = `<div class="card" style="max-width:none"><h3 style="margin-top:0">Upload roster CSV</h3>
+    <p class="muted" style="margin-top:0">Columns: <b>email, name, enrollment, class</b> (header row required). Students on the roster can sign in with that Google email, confirm their details once, and then use the site. Uploading again adds new students and updates changed details.</p>
+    <div class="drop" id="drop"><input type="file" id="file" accept=".csv,text/csv"> <span class="muted">or drop a .csv file here</span></div>
+    <details><summary class="link">…or paste CSV text</summary><textarea id="paste" rows="5" style="width:100%;margin-top:6px" placeholder="email,name,enrollment,class&#10;riya@student.rru.ac.in,Riya Patel,26MDSML001,MTech DSML Sem 1"></textarea><button class="btn ghost sm" id="pasteGo">Preview pasted text</button></details>
+    <div class="tools"><a class="btn ghost sm" href="roster_template.csv" download>Download template</a><button class="btn ghost sm" id="exportRoster">Export current roster</button></div>
+    <div id="preview"></div></div>
+    <h3>Add one student</h3>
+    <div class="tools"><input id="aE" placeholder="email" size="28"><input id="aN" placeholder="full name" size="22"><input id="aEn" placeholder="enrollment" size="16"><input id="aC" placeholder="class" size="18"><button class="btn sm" id="aGo">Add</button></div>
+    <h3>Current roster</h3>
+    <div class="tools"><input id="rq" placeholder="Search name, enrollment, email" size="30"><select id="rf"><option value="">All</option><option value="v">Verified</option><option value="n">Not signed in yet</option></select></div>
+    <div id="rosterArea"></div>`;
+  const handle = text => { PREVIEW = buildPreview(text); drawPreview(); };
+  $("#file").onchange = e => { const f = e.target.files[0]; if (f) f.text().then(handle); };
+  const dz = $("#drop");
+  dz.ondragover = e => { e.preventDefault(); dz.classList.add("over"); };
+  dz.ondragleave = () => dz.classList.remove("over");
+  dz.ondrop = e => { e.preventDefault(); dz.classList.remove("over"); const f = e.dataTransfer.files[0]; if (f) f.text().then(handle); };
+  $("#pasteGo").onclick = () => handle($("#paste").value);
+  $("#exportRoster").onclick = () => download("roster-" + new Date().toISOString().slice(0, 10) + ".csv", [["email", "name", "enrollment", "class", "status"], ...ROSTER.map(r => [r.email, r.name, r.enrollment, r.cls, USERS[r.email] ? "verified" : "not signed in"])]);
+  $("#aGo").onclick = async () => {
+    const p = buildPreview("email,name,enrollment,class\n" + [$("#aE").value, $("#aN").value, $("#aEn").value, $("#aC").value].map(x => '"' + x.replace(/"/g, '""') + '"').join(","));
+    const r = p.rows && p.rows[0];
+    if (!r || r.problem) { toast("Cannot add: " + (r ? r.problem : p.error)); return; }
+    await saveRoster([r]); ["#aE", "#aN", "#aEn", "#aC"].forEach(s => $(s).value = "");
+  };
+  $("#rq").oninput = drawRosterTable; $("#rf").onchange = drawRosterTable;
+  drawPreview(); drawRosterTable();
+}
+function drawPreview(){
+  const box = $("#preview"); if (!box) return;
+  if (!PREVIEW) { box.innerHTML = ""; return; }
+  if (PREVIEW.error) { box.innerHTML = `<p class="bad">${esc(PREVIEW.error)}</p>`; return; }
+  const R = PREVIEW.rows, cnt = k => R.filter(r => r.change === k).length;
+  box.innerHTML = `<p><b>${R.length}</b> rows · <span class="ok">${cnt("new")} new</span> · ${cnt("update")} updated · ${cnt("same")} unchanged · <span class="bad">${cnt("skip")} with problems (skipped)</span></p>
+    <div class="wrap" style="max-height:300px;overflow:auto"><table><thead><tr><th>Email</th><th>Name</th><th>Enrollment</th><th>Class</th><th>Result</th></tr></thead><tbody>${R.map(r => `<tr class="${r.problem ? "err" : r.warn ? "warn" : ""}"><td>${esc(r.email)}</td><td>${esc(r.name)}</td><td>${esc(r.enrollment)}</td><td>${esc(r.cls)}</td><td>${r.problem ? "✗ " + esc(r.problem) : r.change === "new" ? "+ new" : r.change === "update" ? "✎ update" + (r.warn ? " – " + esc(r.warn) : "") : "= no change"}</td></tr>`).join("")}</tbody></table></div>
+    <div class="tools"><button class="btn" id="saveR" ${cnt("new") + cnt("update") ? "" : "disabled"}>Save ${cnt("new") + cnt("update")} students to roster</button><button class="btn ghost" id="cancelR">Cancel</button></div>`;
+  $("#cancelR").onclick = () => { PREVIEW = null; drawPreview(); };
+  $("#saveR").onclick = async () => { $("#saveR").disabled = true; await saveRoster(R.filter(r => r.change === "new" || r.change === "update")); PREVIEW = null; drawPreview(); };
+}
+async function saveRoster(list){
+  try {
+    for (let i = 0; i < list.length; i += 400) {
+      const b = D.writeBatch(db);
+      for (const r of list.slice(i, i + 400)) b.set(D.doc(db, "roster", r.email), { email: r.email, name: r.name, enrollment: r.enrollment, cls: r.cls, addedAt: D.serverTimestamp() });
+      await b.commit();
+    }
+    toast(`Saved ${list.length} student${list.length === 1 ? "" : "s"} to the roster.`);
+  } catch (e) { console.error(e); toast("Could not save roster: " + (e.code || e.message)); }
+}
+function drawRosterTable(){
+  const area = $("#rosterArea"); if (!area) return;
+  const q = ($("#rq").value || "").toLowerCase(), f = $("#rf").value;
+  const rows = ROSTER.filter(r => (!q || [r.name, r.enrollment, r.email, r.cls].join(" ").toLowerCase().includes(q)) && (!f || (f === "v") === !!USERS[r.email]))
+    .sort((a, b) => String(a.enrollment).localeCompare(String(b.enrollment), undefined, { numeric: true }));
+  area.innerHTML = `<div class="wrap"><table><thead><tr><th>Name</th><th>Enrollment</th><th>Class</th><th>Email</th><th>Status</th><th></th></tr></thead><tbody>${rows.map(r => `<tr><td>${esc(r.name)}</td><td>${esc(r.enrollment)}</td><td>${esc(r.cls)}</td><td>${esc(r.email)}</td><td>${USERS[r.email] ? `<span class="ok">✓ verified</span>` : `<span class="no">not signed in yet</span>`}</td>
+    <td>${USERS[r.email] ? `<button class="btn ghost sm" data-reset="${esc(r.email)}">Reset verification</button> ` : ""}<button class="btn danger sm" data-del="${esc(r.email)}">Remove</button></td></tr>`).join("") || `<tr><td colspan="6" class="muted">No students on the roster yet. Upload a CSV above.</td></tr>`}</tbody></table></div>`;
+  $$("[data-del]").forEach(b => b.onclick = async () => {
+    const e = b.dataset.del;
+    if (!confirm(`Remove ${e} from the roster?${USERS[e] ? " They are verified – their account and marks are kept, but new sign-ins will be refused." : ""}`)) return;
+    try { await D.deleteDoc(D.doc(db, "roster", e)); toast("Removed."); } catch (er) { toast(er.code || er.message); }
+  });
+  $$("[data-reset]").forEach(b => b.onclick = async () => {
+    const e = b.dataset.reset, u = USERS[e];
+    if (!confirm(`Reset verification for ${e}? They will confirm their details again on next sign-in (useful after you corrected the roster). Their marks are kept.`)) return;
+    try { await D.deleteDoc(D.doc(db, "users", u.uid)); toast("Verification reset."); } catch (er) { toast(er.code || er.message); }
+  });
+}
+
+/* ---------- marks ---------- */
+function drawMarks(S){
+  const v = $("#view");
+  const classes = [...new Set(S.map(s => s.cls).filter(Boolean))].sort();
+  if (!$("#mq")) {
+    v.innerHTML = `<div class="tools"><input id="mq" placeholder="Search name, enrollment, email" size="30"><select id="mc"><option value="">All classes</option>${classes.map(c => `<option>${esc(c)}</option>`).join("")}</select>
+      <label class="muted"><input type="checkbox" id="mv" checked> verified only</label><button class="btn ghost" id="csv">Export marks CSV</button></div><div id="mtable"></div>
+      <p class="muted" style="font-size:14px">Score = tasks whose last submitted answer is correct (1 mark each). <b>F</b> = final-submitted. Scores update live as students submit.</p>`;
+    $("#mq").oninput = () => drawMarks(students()); $("#mc").onchange = () => drawMarks(students()); $("#mv").onchange = () => drawMarks(students());
+    $("#csv").onclick = () => exportMarks(students());
+  }
+  const q = $("#mq").value.toLowerCase(), c = $("#mc").value, onlyV = $("#mv").checked;
+  const rows = S.filter(s => (!onlyV || s.verified) && (!c || s.cls === c) && (!q || [s.name, s.enrollment, s.email].join(" ").toLowerCase().includes(q)));
+  const val = (s, k) => k.startsWith("t_") ? s.topics[k.slice(2)].score : s[k];
+  rows.sort((a, b) => { const x = val(a, SORT.k), y = val(b, SORT.k); return (typeof x === "number" ? x - y : String(x).localeCompare(String(y), undefined, { numeric: true })) * SORT.dir; });
+  const cols = [["name", "Name"], ["enrollment", "Enrollment"], ["cls", "Class"], ...TOPICS.map(T => ["t_" + T.id, `${T.title} /${TOPIC[T.id].tasks.length}`]), ["total", `Total /${ALLMAX}`], ["last", "Last submit"]];
+  $("#mtable").innerHTML = `<div class="wrap"><table><thead><tr>${cols.map(([k, l]) => `<th data-k="${k}">${esc(l)}${SORT.k === k ? (SORT.dir > 0 ? " ▲" : " ▼") : ""}</th>`).join("")}</tr></thead><tbody>${rows.map(s => `<tr>
+    <td>${s.verified ? `<span class="link" data-email="${esc(s.email)}">${esc(s.name)}</span>` : esc(s.name)}<br><span class="muted" style="font-size:12.5px">${esc(s.email)}</span></td><td>${esc(s.enrollment)}</td><td>${esc(s.cls)}</td>
+    ${TOPICS.map(T => { const x = s.topics[T.id]; return `<td class="num">${x.sub ? `${x.score} <span class="muted">(${x.sub} sub)</span>` : "–"} ${x.final ? `<span class="ok" title="Final submitted ${esc(fmt(x.finalAt))}">F</span>` : ""}</td>`; }).join("")}
+    <td class="num"><b>${s.total}</b></td><td>${fmt(s.last)}</td></tr>`).join("") || `<tr><td colspan="${cols.length}" class="muted">No students yet.</td></tr>`}</tbody></table></div>`;
+  $$("#mtable th").forEach(th => th.onclick = () => { const k = th.dataset.k; SORT = { k, dir: SORT.k === k ? -SORT.dir : (["name", "enrollment", "cls"].includes(k) ? 1 : -1) }; drawMarks(students()); });
+  $$("#mtable [data-email]").forEach(x => x.onclick = () => detail(x.dataset.email));
+}
+function exportMarks(S){
+  const head = ["Name", "Enrollment", "Class", "Email", "Verified", ...TOPICS.flatMap(T => [`${T.title} score (/${TOPIC[T.id].tasks.length})`, `${T.title} submitted`, `${T.title} final`]), `Total (/${ALLMAX})`];
+  const lines = S.map(s => [s.name, s.enrollment, s.cls, s.email, s.verified ? "yes" : "no", ...TOPICS.flatMap(T => { const x = s.topics[T.id]; return [x.score, x.sub, x.final ? "yes" : "no"]; }), s.total]);
+  download("unit3-marks-" + new Date().toISOString().slice(0, 10) + ".csv", [head, ...lines]);
+}
+function download(name, rows){
+  const csv = rows.map(l => l.map(x => { const s = String(x ?? ""); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }).join(",")).join("\n");
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv" })); a.download = name; a.click();
+}
+async function detail(email){
+  const s = students().find(x => x.email === email); if (!s || !s.uid) return;
+  const dlg = $("#dlg");
+  dlg.innerHTML = `<div class="dh"><h2>${esc(s.name)} · ${esc(s.enrollment)}</h2><span class="muted">${esc(s.cls)} · ${esc(s.email)}</span><button class="btn ghost" id="cl">Close</button></div><div class="db"><p class="muted">Loading submitted code…</p></div>`;
+  dlg.showModal(); $("#cl").onclick = () => dlg.close();
+  let code = {};
+  try { (await D.getDocs(D.query(D.collection(db, "attempts"), D.where("uid", "==", s.uid)))).forEach(d => { const x = d.data(); code[x.item] = x; }); } catch (e) { toast("Could not load code: " + (e.code || e.message)); }
+  let h = `<p>Total <b>${s.total}/${ALLMAX}</b></p>`;
+  for (const T of TOPICS) {
+    const x = s.topics[T.id], n = TOPIC[T.id].tasks.length;
+    h += `<div class="les"><span>${esc(T.title)} – ${x.score}/${n} correct · ${x.sub} submitted</span>${x.final ? `<span class="ok">✓ final-submitted ${esc(fmt(x.finalAt))}</span> <button class="btn ghost sm" data-reopen="${T.id}">Reopen for this student</button>` : `<span class="muted">not final-submitted</span>`}</div>`;
+    for (const id of TOPIC[T.id].tasks) {
+      const it = x.items[id], c = code[id], tk = TASK[id];
+      h += `<div class="it"><span title="${esc(tk.L.title)}">L${tk.L.num} · T${tk.n}</span><span>${esc(tk.t.t)}</span>${it ? (it.ok ? `<span class="ok">✓ correct</span>` : `<span class="bad">✗ incorrect</span>`) : `<span class="no">not submitted</span>`}<span class="muted">${it ? it.tries + " sub" : ""}</span>${c && c.code ? `<pre class="code">${esc(c.code)}</pre>` : ""}</div>`;
+    }
+  }
+  dlg.querySelector(".db").innerHTML = h;
+  dlg.querySelectorAll("[data-reopen]").forEach(b => b.onclick = async () => {
+    const t = b.dataset.reopen;
+    if (!confirm(`Reopen ${TOPIC[t].title} for ${s.name}? They will be able to change answers and final-submit again.`)) return;
+    try { await D.updateDoc(D.doc(db, "progress", `${s.uid}__${t}`), { final: false }); toast("Reopened."); dlg.close(); } catch (e) { toast(e.code || e.message); }
+  });
+}
+
+/* ---------- task analysis ---------- */
+function drawTasks(S){
+  const ver = S.filter(s => s.verified), n = ver.length || 1;
+  let h = `<p class="muted">How many verified students submitted each task and how many got it right – sorted within each topic by most incorrect.</p>`;
+  for (const T of TOPICS) {
+    const rows = TOPIC[T.id].tasks.map(id => { const sub = ver.filter(s => s.topics[T.id].items[id]).length, ok = ver.filter(s => (s.topics[T.id].items[id] || {}).ok).length; return { id, sub, ok, bad: sub - ok }; }).sort((a, b) => b.bad - a.bad);
+    h += `<h3>${esc(T.title)}</h3><div class="wrap"><table><thead><tr><th>Lesson</th><th>Task</th><th>Submitted</th><th>Correct</th><th>Incorrect</th></tr></thead><tbody>${rows.map(r => `<tr><td>${esc(TASK[r.id].L.title)}</td><td>T${TASK[r.id].n}: ${esc(TASK[r.id].t.t)}</td><td class="num">${r.sub}</td><td class="num">${r.ok} (${Math.round(100 * r.ok / n)}%)</td><td class="num ${r.bad ? "bad" : ""}">${r.bad}</td></tr>`).join("")}</tbody></table></div>`;
+  }
+  $("#view").innerHTML = h;
+}
+</script>
+</body>
+</html>
